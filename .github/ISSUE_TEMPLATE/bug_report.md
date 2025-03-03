@@ -1,37 +1,39 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Let us know if something's not working right
 title: '[BUG] '
 labels: bug
 assignees: ''
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+> **⚠️ Research Notice**: This project is for research purposes to evaluate how Large Language Models (LLMs) perform on software development projects.
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Enter '....'
-4. See error
+### 👾 What's broken?
+<!-- Tell us what's not working in simple terms -->
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+### 🔄 How to see the bug
+<!-- What did you do when you found the problem? -->
+1. 
+2. 
+3. 
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+### ✅ What should happen instead
+<!-- What were you expecting to see? -->
 
-**Environment (please complete the following information):**
- - OS: [e.g. Windows, macOS, Linux]
- - Browser: [e.g. Chrome, Firefox, Safari]
- - Version: [e.g. 22]
- - Python version: [e.g. 3.8, 3.9]
+### 📱 Your setup
+<!-- These details help us figure things out -->
+- Device: <!-- phone, laptop, etc. -->
+- OS: <!-- Windows, Mac, Linux, iOS, Android -->
+- Browser: <!-- Chrome, Firefox, Safari, etc. -->
+- App version: <!-- if you know it -->
 
-**Additional context**
-Add any other context about the problem here.
+### 📸 Screenshots
+<!-- If you have any pictures of the bug, drop them here -->
 
-**Error message (if applicable)**
+### 🧩 Extra info
+<!-- Anything else that might help us understand the problem -->
+
+### 💬 Error message (if you got one)
 ```
-Paste the exact error message here.
+Paste any error messages here
 ``` 

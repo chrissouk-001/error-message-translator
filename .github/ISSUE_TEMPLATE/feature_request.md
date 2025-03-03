@@ -1,26 +1,31 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
-title: '[FEATURE] '
+about: Got a cool idea? Let us know!
+title: '[IDEA] '
 labels: enhancement
 assignees: ''
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+> **⚠️ Research Notice**: This project is for research purposes to evaluate how Large Language Models (LLMs) perform on software development projects.
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+### 💡 Your idea
+<!-- What's your awesome idea? -->
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+### 🤔 Why it would be cool
+<!-- How would this make the project better? Is it solving a problem? -->
 
-**Error patterns to support (if applicable)**
-If your feature request is for adding support for new error patterns, please provide examples of the error messages you'd like to see translated.
+### 🌟 What it would look like
+<!-- How would you imagine this working? -->
+
+### 🔄 Other possible solutions
+<!-- Any other ways this could be done? (totally optional) -->
+
+### 🧠 For new error patterns
+<!-- If you want us to handle a new type of error message, share an example: -->
 
 ```
 Example error message here
 ```
 
-**Additional context**
-Add any other context or screenshots about the feature request here. 
+### 📝 Anything else?
+<!-- Any other thoughts, references, or screenshots? --> 
