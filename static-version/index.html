@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Message Translator</title>
+    <meta name="description" content="Translate confusing programming error messages into simple, understandable explanations. Perfect for beginners learning Python, JavaScript, HTML, and CSS.">
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Prism.js for syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" id="prism-theme">
+</head>
+<body>
+    <!-- Research Notice Banner -->
+    <div class="research-notice">
+        <div class="notice-content">
+            <span class="notice-icon">⚠️</span>
+            <p><strong>Research Notice:</strong> This project is for research purposes to evaluate how Large Language Models (LLMs) perform on software development projects. <a href="https://github.com/chrissouk-001/error-message-translator" target="_blank">Everyone is welcome to contribute</a> to this repository as part of this research test.</p>
+        </div>
+        <button class="notice-close" aria-label="Close notice"><i class="fas fa-times"></i></button>
+    </div>
+    
+    <!-- Theme toggle -->
+    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode"><i class="fas fa-moon"></i></button>
+
+    <header>
+        <div class="container">
+            <div class="logo"><i class="fas fa-language"></i></div>
+            <h1 class="fade-in">Error Message Translator</h1>
+            <p class="tagline fade-in">Demystify code errors across Python, JavaScript, HTML, and CSS in seconds</p>
+            <div class="header-buttons fade-in">
+                <a href="https://github.com/chrissouk-001/error-message-translator" target="_blank" class="secondary-btn">
+                    <i class="fab fa-github"></i> View on GitHub
+                </a>
+                <button id="help-btn" class="secondary-btn">
+                    <i class="fas fa-question-circle"></i> How It Works
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="input-section card">
+            <h2>Paste your error message</h2>
+            <div class="language-options">
+                <div class="language-selector">
+                    <label for="language-select">Programming Language:</label>
+                    <select id="language-select">
+                        <option value="auto">Auto-detect Language</option>
+                        <option value="python">Python</option>
+                        <option value="javascript">JavaScript</option>
+                        <option value="html">HTML</option>
+                        <option value="css">CSS</option>
+                        <option value="general">General Code</option>
+                    </select>
+                </div>
+                <div class="language-selector output-language-selector">
+                    <label for="output-language-select">Output Language:</label>
+                    <select id="output-language-select">
+                        <option value="en">English</option>
+                    </select>
+                </div>
+            </div>
+            <div class="error-input-container">
+                <textarea id="error-input" placeholder="Paste your error message here..."></textarea>
+                <div class="button-group">
+                    <button id="translate-btn" class="primary-btn">
+                        <i class="fas fa-exchange-alt"></i> Translate Error
+                    </button>
+                    <button id="clear-btn" class="secondary-btn">
+                        <i class="fas fa-trash-alt"></i> Clear
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="translation-section" id="translation-result">
+            <div class="result-placeholder" id="result-placeholder">
+                <i class="fas fa-arrow-circle-up pulse"></i>
+                <p>Your translated error will appear here</p>
+            </div>
+            
+            <div class="translation-content card result-card" id="translation-content" style="display: none;">
+                <div class="translation-header">
+                    <div class="title-language-container">
+                        <h2 id="error-title" class="error-title">Error Title</h2>
+                        <div class="badges-container">
+                            <span class="language-badge" id="language-badge">Language</span>
+                            <div id="difficulty-badge" class="difficulty-badge">Difficulty</div>
+                        </div>
+                    </div>
+                    <button id="copy-result-btn" class="icon-btn" title="Copy entire translation">
+                        <i class="fas fa-copy"></i> Copy Result
+                    </button>
+                </div>
+                
+                <div class="original-error">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Original Error</h3>
+                    <pre id="original-error"></pre>
+                </div>
+                
+                <div class="explanation">
+                    <h3><i class="fas fa-info-circle"></i> What This Means</h3>
+                    <p id="explanation-text"></p>
+                </div>
+                
+                <div class="solution">
+                    <h3><i class="fas fa-wrench"></i> How To Fix It</h3>
+                    <p id="solution-text"></p>
+                </div>
+                
+                <div class="code-example" id="code-example-container">
+                    <h3><i class="fas fa-code"></i> Code Example</h3>
+                    <div class="code-container">
+                        <pre><code id="code-example" class="language-none"></code></pre>
+                        <button id="copy-code-btn" class="icon-btn" title="Copy code">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="related-errors" id="related-errors-container">
+                    <h3><i class="fas fa-link"></i> Related Errors</h3>
+                    <ul id="related-errors-list" class="related-errors-list"></ul>
+                </div>
+            </div>
+        </section>
+        
+        <section class="recent-searches card" id="recent-searches">
+            <h2>Recent Searches</h2>
+            <div class="searches-container" id="searches-container">
+                <p class="empty-message">Your recent searches will appear here</p>
+            </div>
+            <div class="recent-searches-footer">
+                <button id="clear-searches-btn" class="secondary-btn">
+                    <i class="fas fa-trash-alt"></i> Clear All
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Created for beginner developers to help understand error messages</p>
+            <p>
+                <a href="https://github.com/chrissouk-001/error-message-translator" target="_blank">
+                    <i class="fab fa-github"></i> View on GitHub
+                </a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Loading overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-container">
+            <div class="spinner"></div>
+            <p>Translating your error...</p>
+        </div>
+    </div>
+    
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+    
+    <!-- Main Application Script -->
+    <script src="js/main.js"></script>
+</body>
+</html> 
