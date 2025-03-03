@@ -545,6 +545,41 @@ for (const item of safeData) {
   console.log(item);
 }
 '''
+    },
+    {
+        'regex': r'TypeError: Cannot read propert(?:y|ies) \'([^\']+)\' of ([^\']+)',
+        'title': 'Cannot Read Property "{{$1}}"',
+        'explanation': 'JavaScript cannot read the property "{{$1}}" because the object is {{$2}}. This usually happens when trying to access properties on null or undefined values.',
+        'solution': 'Check that your object exists and is properly initialized before trying to access its properties.',
+        'code_example': '''
+// Incorrect:
+const obj = null;
+console.log(obj.length);  // Error: Cannot read property 'length' of null
+
+// Correct:
+const obj = null;
+if (obj !== null && obj !== undefined) {
+    console.log(obj.length);
+} else {
+    console.log('Object is null or undefined');
+}
+''',
+        'difficulty': 'beginner'
+    },
+    {
+        'regex': r'ReferenceError: ([^\']+) is not defined',
+        'title': 'Variable "{{$1}}" Not Defined',
+        'explanation': 'JavaScript cannot find a variable named "{{$1}}". This means you\'re trying to use a variable that hasn\'t been declared.',
+        'solution': 'Make sure you declare the variable before using it. Check for typos in variable names.',
+        'code_example': '''
+// Incorrect:
+console.log(someVar);  // Error: someVar is not defined
+
+// Correct:
+let someVar = 'Hello';
+console.log(someVar);  // Works!
+''',
+        'difficulty': 'beginner'
     }
 ]
 

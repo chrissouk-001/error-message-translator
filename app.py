@@ -38,6 +38,10 @@ def translate():
     """Translate an error message"""
     data = request.get_json()
     
+    # Check if error_message is present in the request
+    if 'error_message' not in data:
+        return jsonify({'error': 'Missing error message'}), 400
+    
     error_message = data.get('error_message', '')
     language = data.get('language', 'auto')
     

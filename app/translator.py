@@ -81,11 +81,12 @@ def translate_error(error_message, language='auto', output_language=None):
     
     if not error_message:
         return {
-            'title': 'No Error Message Provided',
+            'title': 'No error message provided',
             'explanation': 'Please provide an error message to translate.',
             'original_error': '',
             'solution': 'Enter an error message in the input field above.',
-            'difficulty': 'beginner'  # Default difficulty for empty error
+            'difficulty': 'beginner',  # Default difficulty for empty error
+            'language': 'unknown'  # Change to 'unknown' for empty messages
         }
     
     # Detect programming language if set to auto
@@ -160,6 +161,8 @@ def get_general_response(error_message, language, output_language=None):
     
     # Get the title based on the language
     title = generic_titles.get(language, 'Code Error')
+    if language == 'general':
+        title = 'Unknown Error'
     
     # Generic explanation and solution
     explanation = "This appears to be an error in your code that I don't specifically recognize."

@@ -22,7 +22,6 @@ The Error Message Translator provides a clean, intuitive interface for translati
 - **Frontend**: HTML, CSS, JavaScript
 - **Backend**: Python with Flask
 - **Storage**: Browser localStorage for recent searches
-- **Testing**: pytest for unit and integration tests, Selenium for frontend tests
 
 ## Prerequisites
 
@@ -52,11 +51,7 @@ Before running this application, you need to have the following installed:
 
 3. Install dependencies:
    ```bash
-   # Install app dependencies only
    pip install -r requirements.txt
-   
-   # Or install both app and testing dependencies
-   pip install -r requirements-test.txt
    ```
 
 ## Running the Application
@@ -69,52 +64,6 @@ Before running this application, you need to have the following installed:
 2. Open your web browser and navigate to:
    ```
    http://localhost:5001
-   ```
-
-## Testing
-
-The application includes comprehensive test coverage with pytest:
-
-1. Make sure you have the testing dependencies installed:
-   ```bash
-   pip install -r requirements-test.txt
-   ```
-
-2. Run all tests:
-   ```bash
-   ./run_tests.sh
-   ```
-
-3. Run only unit tests:
-   ```bash
-   ./run_tests.sh --unit
-   ```
-
-4. Run only integration tests:
-   ```bash
-   ./run_tests.sh --integration
-   ```
-
-5. Run tests with coverage report:
-   ```bash
-   ./run_tests.sh --coverage
-   ```
-
-6. Run Selenium frontend tests:
-   ```bash
-   ./run_selenium_tests.sh
-   ```
-   
-   Selenium test options:
-   ```bash
-   # Run with verbose output
-   ./run_selenium_tests.sh --verbose
-   
-   # Run only theme toggle tests
-   ./run_selenium_tests.sh --theme-only
-   
-   # Run only recent searches tests
-   ./run_selenium_tests.sh --searches-only
    ```
 
 ## How It Works
@@ -130,7 +79,6 @@ The application includes comprehensive test coverage with pytest:
 error-message-translator/
 ├── app.py                  # Main Flask application
 ├── requirements.txt        # Application dependencies
-├── requirements-test.txt   # Testing dependencies (includes app dependencies)
 ├── app/
 │   ├── translator.py       # Core translation logic
 │   ├── data/
@@ -142,16 +90,6 @@ error-message-translator/
 │   │       └── main.js     # Frontend JavaScript
 │   └── templates/
 │       └── index.html      # Main HTML template
-├── tests/
-│   ├── conftest.py        # Test configuration and fixtures
-│   ├── unit/              # Unit tests
-│   │   ├── test_translator.py
-│   │   ├── test_error_patterns.py
-│   │   └── test_frontend.py
-│   └── integration/       # Integration tests
-│       ├── test_api.py
-│       ├── test_recent_searches.py  # Selenium tests for recent searches
-│       └── test_theme_toggle.py     # Selenium tests for theme toggle
 └── screenshots/            # Project screenshots
 ```
 
@@ -179,12 +117,10 @@ To add new error patterns, edit the `app/data/error_patterns.py` file and add a 
 - [ ] Add user feedback mechanism for translations
 - [ ] Support more programming languages
 - [ ] Add ability to share translations via URL
-- [ ] Refactor frontend code for better structure.
-- [ ] Add integration tests for new features.
-- [ ] Create documentation for API usage.
-- [ ] Setup CI/CD pipeline.
+- [ ] Refactor frontend code for better structure
+- [ ] Create documentation for API usage
+- [ ] Setup CI/CD pipeline
 - [ ] Integrate caching layer for error translations
-- [ ] Add unit tests for the translate_text function
 - [ ] Optimize performance of regex matching
 - [ ] Implement error message validation in JavaScript
 
