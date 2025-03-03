@@ -1393,42 +1393,52 @@ html {
 }
 
 .research-notice .notice-close {
-    background: transparent;
+    background-color: rgba(0, 0, 0, 0.15);
     border: none;
     color: #333;
     cursor: pointer;
-    font-size: 1rem;
-    width: 28px;
-    height: 28px;
+    font-size: 1.1rem;
+    width: 30px;
+    height: 30px;
     padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    margin-left: 10px;
-    opacity: 0.8;
-    background-color: rgba(0, 0, 0, 0.1);
+    margin-left: 12px;
+    opacity: 0.85;
     transition: all 0.2s ease;
     z-index: 101;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .research-notice .notice-close:hover {
     opacity: 1;
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.25);
     transform: scale(1.1);
 }
 
-[data-theme="dark"] .research-notice {
-    background-color: var(--warning-color);
-    color: #000;
+.research-notice .notice-close:active {
+    transform: scale(0.95);
 }
 
-[data-theme="dark"] .research-notice a {
-    color: #1a73e8;
+.research-notice .notice-close:before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
 }
 
-[data-theme="dark"] .research-notice a:hover {
-    color: #3b8bf4;
+[data-theme="dark"] .research-notice .notice-close {
+    color: #333;
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+[data-theme="dark"] .research-notice .notice-close:hover {
+    background-color: rgba(255, 255, 255, 0.35);
 }
 
 @media (max-width: 600px) {
@@ -1448,11 +1458,15 @@ html {
     }
 }
 
-[data-theme="dark"] .research-notice .notice-close {
-    color: #333;
-    background-color: rgba(255, 255, 255, 0.2);
+[data-theme="dark"] .research-notice {
+    background-color: var(--warning-color);
+    color: #000;
 }
 
-[data-theme="dark"] .research-notice .notice-close:hover {
-    background-color: rgba(255, 255, 255, 0.3);
+[data-theme="dark"] .research-notice a {
+    color: #1a73e8;
+}
+
+[data-theme="dark"] .research-notice a:hover {
+    color: #3b8bf4;
 } 

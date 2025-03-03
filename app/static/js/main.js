@@ -86,76 +86,88 @@ function init() {
  */
 function setupResearchNotice() {
     const researchNotice = document.querySelector('.research-notice');
-    if (researchNotice) {
-        // Check if user has already closed the notice before
-        const noticeHidden = localStorage.getItem('research_notice_hidden') === 'true';
-        if (noticeHidden) {
-            researchNotice.style.display = 'none';
-            return;
-        }
-        
-        // Add a click event to the close button
-        const closeButton = researchNotice.querySelector('.notice-close');
-        if (closeButton) {
-            // Make sure button is visible and clickable
-            closeButton.style.display = 'flex';
-            closeButton.style.opacity = '1';
-            closeButton.style.pointerEvents = 'auto';
-            
-            closeButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation(); // Prevent the click from propagating
-                console.log('Research notice close button clicked');
-                
-                // Fade out and hide the notice
-                researchNotice.style.opacity = '0';
-                setTimeout(() => {
-                    researchNotice.style.display = 'none';
-                    // Remember that user closed the notice
-                    localStorage.setItem('research_notice_hidden', 'true');
-                }, 300);
-            });
-        }
-        
-        // Make the notice visible (in case CSS has opacity 0)
-        researchNotice.style.opacity = '1';
-        researchNotice.style.display = 'flex';
-        
-        // Add hover effect for better UX
-        researchNotice.addEventListener('mouseenter', function() {
-            if (closeButton) closeButton.style.opacity = '1';
-        });
-        
-        researchNotice.addEventListener('mouseleave', function() {
-            if (closeButton) closeButton.style.opacity = '0.7';
-        });
-        
-        // Add transition effect for smooth disappearance
-        researchNotice.style.transition = 'opacity 0.3s ease';
-        
-        // Detect scroll past a certain point to dismiss the notice
-        window.addEventListener('scroll', function() {
-            if (window.scrollY > 150 && researchNotice.style.display !== 'none') {
-                researchNotice.style.opacity = '0';
-                setTimeout(() => {
-                    researchNotice.style.display = 'none';
-                    // Don't save to localStorage if just scrolled away
-                }, 300);
-            }
-        }, { once: true });
-        
-        // Alternatively, make it disappear after 20 seconds
-        setTimeout(() => {
-            if (researchNotice && researchNotice.style.display !== 'none') {
-                researchNotice.style.opacity = '0';
-                setTimeout(() => {
-                    researchNotice.style.display = 'none';
-                    // Don't save to localStorage if auto-dismissed
-                }, 300);
-            }
-        }, 20000);
+    if (!researchNotice) return;
+    
+    // Check if user has already closed the notice before
+    const noticeHidden = localStorage.getItem('research_notice_hidden') === 'true';
+    if (noticeHidden) {
+        researchNotice.style.display = 'none';
+        return;
     }
+    
+    // Make sure the notice is visible
+    researchNotice.style.display = 'flex';
+    researchNotice.style.opacity = '1';
+    
+    // Set up the close button with enhanced reliability
+    const closeButton = researchNotice.querySelector('.notice-close');
+    if (closeButton) {
+        // Remove any existing event listeners to prevent duplicates
+        const newCloseButton = closeButton.cloneNode(true);
+        closeButton.parentNode.replaceChild(newCloseButton, closeButton);
+        
+        // Make the button more visible and ensure it's clickable
+        newCloseButton.style.display = 'flex';
+        newCloseButton.style.opacity = '1';
+        newCloseButton.style.pointerEvents = 'auto';
+        newCloseButton.style.cursor = 'pointer';
+        
+        // Add a more robust event listener
+        newCloseButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Research notice close button clicked');
+            
+            // Hide the notice
+            researchNotice.style.opacity = '0';
+            setTimeout(() => {
+                researchNotice.style.display = 'none';
+                // Save the user's preference
+                localStorage.setItem('research_notice_hidden', 'true');
+            }, 300);
+        });
+        
+        // Also add a direct onclick attribute as a fallback
+        newCloseButton.setAttribute('onclick', "event.stopPropagation(); this.parentNode.style.opacity='0'; setTimeout(() => { this.parentNode.style.display='none'; localStorage.setItem('research_notice_hidden', 'true'); }, 300);");
+    }
+    
+    // Add hover effect for better UX
+    researchNotice.addEventListener('mouseenter', function() {
+        const btn = researchNotice.querySelector('.notice-close');
+        if (btn) btn.style.opacity = '1';
+    });
+    
+    researchNotice.addEventListener('mouseleave', function() {
+        const btn = researchNotice.querySelector('.notice-close');
+        if (btn) btn.style.opacity = '0.9';
+    });
+    
+    // Add transition effect for smooth disappearance
+    researchNotice.style.transition = 'opacity 0.3s ease';
+    
+    // Detect scroll past a certain point to dismiss the notice
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 180 && researchNotice.style.display !== 'none') {
+            researchNotice.style.opacity = '0';
+            setTimeout(() => {
+                researchNotice.style.display = 'none';
+            }, 300);
+        }
+    }, { once: true });
+    
+    // Alternatively, make it disappear after 20 seconds
+    setTimeout(() => {
+        if (researchNotice && researchNotice.style.display !== 'none') {
+            researchNotice.style.opacity = '0';
+            setTimeout(() => {
+                researchNotice.style.display = 'none';
+            }, 300);
+        }
+    }, 20000);
 }
+
+// Ensure the setup runs when the DOM is loaded
+document.addEventListener('DOMContentLoaded', setupResearchNotice);
 
 /**
  * Check if we're on the correct port and show notification if needed
