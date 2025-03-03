@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Message Translator</title>
+    <meta name="description" content="Translate confusing programming error messages into simple, understandable explanations. Perfect for beginners learning Python, JavaScript, HTML, and CSS.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Prism.js for syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" id="prism-theme">
+    <script>
+        // Check if we're on the wrong port and redirect if needed
+        if (window.location.port === '5000' && window.location.hostname === 'localhost') {
+            // If we're on port 5000, redirect to port 5001
+            window.location.href = window.location.href.replace(':5000', ':5001');
+        }
+    </script>
+</head>
+<body>
+    <!-- Port notification -->
+    <div id="port-notification" class="port-notification">
+        This app is running on port 5001. If you're having connection issues, please ensure you're accessing <a href="http://localhost:5001/">http://localhost:5001/</a>
+    </div>
+    
+    <!-- Theme toggle -->
+    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode"><i class="fas fa-moon"></i></button>
+
+    <header>
+        <div class="container">
+            <div class="logo"><i class="fas fa-language"></i></div>
+            <h1 class="fade-in">Error Message Translator</h1>
+            <p class="tagline fade-in">Demystify code errors across Python, JavaScript, HTML, and CSS in seconds</p>
+            <div class="header-buttons fade-in">
+                <a href="https://github.com/yourusername/error-message-translator" target="_blank" class="secondary-btn">
+                    <i class="fab fa-github"></i> View on GitHub
+                </a>
+                <button id="help-btn" class="secondary-btn">
+                    <i class="fas fa-question-circle"></i> How It Works
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="input-section card">
+            <h2>Paste your error message</h2>
+            <div class="language-options">
+                <div class="language-selector">
+                    <label for="language-select">Programming Language:</label>
+                    <select id="language-select">
+                        <option value="auto">Auto-detect Language</option>
+                        <option value="python">Python</option>
+                        <option value="javascript">JavaScript</option>
+                        <option value="html">HTML</option>
+                        <option value="css">CSS</option>
+                        <option value="general">General Code</option>
+                    </select>
+                </div>
+                <div class="language-selector output-language-selector">
+                    <label for="output-language-select">Output Language:</label>
+                    <select id="output-language-select">
+                        <option value="en">English</option>
+                        <!-- Options will be populated by JavaScript -->
+                    </select>
+                </div>
+            </div>
+            <div class="error-input-container">
+                <textarea id="error-input" placeholder="Paste your error message here..."></textarea>
+                <div class="button-group">
+                    <button id="translate-btn" class="primary-btn" onclick="translateError()">
+                        <i class="fas fa-exchange-alt"></i> Translate Error
+                    </button>
+                    <button id="clear-btn" class="secondary-btn" onclick="clearInput()">
+                        <i class="fas fa-trash-alt"></i> Clear
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="translation-section" id="translation-result">
+            <div class="result-placeholder" id="result-placeholder">
+                <i class="fas fa-arrow-circle-up pulse"></i>
+                <p>Your translated error will appear here</p>
+            </div>
+            
+            <!-- This content will be hidden initially and shown after translation -->
+            <div class="translation-content card result-card" id="translation-content" style="display: none;">
+                <div class="translation-header">
+                    <div class="title-language-container">
+                        <h2 id="error-title" class="error-title">Error Title</h2>
+                        <div class="badges-container">
+                            <div id="language-badge" class="language-badge">Language</div>
+                            <div id="difficulty-badge" class="difficulty-badge">Difficulty</div>
+                            <!-- Output language will be added here -->
+                        </div>
+                    </div>
+                    <button id="copy-result-btn" class="icon-btn" title="Copy entire translation">
+                        <i class="fas fa-copy"></i> Copy Result
+                    </button>
+                </div>
+                
+                <div class="original-error">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Original Error</h3>
+                    <pre id="original-error"></pre>
+                </div>
+                
+                <div class="explanation">
+                    <h3><i class="fas fa-info-circle"></i> What This Means</h3>
+                    <p id="explanation-text"></p>
+                </div>
+                
+                <div class="solution">
+                    <h3><i class="fas fa-wrench"></i> How To Fix It</h3>
+                    <p id="solution-text"></p>
+                </div>
+                
+                <div class="code-example" id="code-example-container">
+                    <h3><i class="fas fa-code"></i> Code Example</h3>
+                    <div class="code-container">
+                        <pre><code id="code-example" class="language-none"></code></pre>
+                        <button id="copy-code-btn" class="icon-btn" title="Copy code">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="related-errors" id="related-errors-container">
+                    <h3><i class="fas fa-link"></i> Related Errors</h3>
+                    <ul id="related-errors-list" class="related-errors-list"></ul>
+                </div>
+            </div>
+        </section>
+        
+        <section class="recent-searches card" id="recent-searches">
+            <h2>Recent Searches</h2>
+            <div class="searches-container" id="searches-container">
+                <p class="empty-message">Your recent searches will appear here</p>
+                <!-- Recent searches will be populated by JavaScript -->
+            </div>
+            <div class="recent-searches-footer">
+                <button id="run-tests-btn" class="secondary-btn" onclick="testRecentSearches()">
+                    <i class="fas fa-vial"></i> Run Tests
+                </button>
+                <button id="clear-searches-btn" class="secondary-btn" onclick="clearRecentSearches()">
+                    <i class="fas fa-trash-alt"></i> Clear All
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Created for beginner developers to help understand error messages</p>
+            <p>
+                <a href="https://github.com/yourusername/error-message-translator" target="_blank">
+                    <i class="fab fa-github"></i> View on GitHub
+                </a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Loading overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-container">
+            <div class="spinner"></div>
+            <p>Translating your error...</p>
+        </div>
+    </div>
+    
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+    
+    <!-- Main Application Script -->
+    <script src="{{ url_for('static', filename='js/main.js') }}?v=1.2.{{range(1, 10000) | random}}"></script>
+    <!-- Additional Script with Toast Notifications -->
+    <script src="{{ url_for('static', filename='js/script.js') }}?v=1.2.{{range(1, 10000) | random}}"></script>
+    
+    <!-- Inline JavaScript for direct button handling -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle translate button
+            const translateButton = document.getElementById('translate-btn');
+            if (translateButton) {
+                translateButton.onclick = function() {
+                    console.log("Translate button clicked directly");
+                    try {
+                        const errorMessage = document.getElementById('error-input').value.trim();
+                        if (!errorMessage) {
+                            alert('Please enter an error message to translate.');
+                            return;
+                        }
+                        
+                        // Show loading
+                        document.getElementById('loading-overlay').style.display = 'flex';
+                        
+                        // Get selected language
+                        const language = document.getElementById('language-select').value;
+                        
+                        // Use current origin instead of hardcoded localhost
+                        const apiUrl = `${window.location.origin}/api/translate`;
+                        console.log("Using API URL:", apiUrl);
+                        
+                        // Make API request
+                        fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                error_message: errorMessage,
+                                language: language,
+                                output_language: 'en'
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`Server error: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(result => {
+                            // Call the displayTranslation function from main.js
+                            if (typeof displayTranslation === 'function') {
+                                displayTranslation(result);
+                            } else {
+                                console.error('displayTranslation function not found');
+                                alert('Error displaying translation. Please try again.');
+                            }
+                            
+                            // Hide loading
+                            document.getElementById('loading-overlay').style.display = 'none';
+                        })
+                        .catch(error => {
+                            console.error('Translation error:', error);
+                            alert('Failed to translate: ' + error.message);
+                            // Hide loading
+                            document.getElementById('loading-overlay').style.display = 'none';
+                        });
+                    } catch (error) {
+                        console.error('Error in translate button handler:', error);
+                        alert('An error occurred: ' + error.message);
+                    }
+                };
+            }
+            
+            // Handle theme toggle button
+            const themeToggle = document.getElementById('theme-toggle');
+            if (themeToggle) {
+                themeToggle.onclick = function() {
+                    console.log("Theme toggle clicked directly");
+                    try {
+                        // Toggle theme
+                        const currentTheme = document.documentElement.getAttribute('data-theme');
+                        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                        
+                        // Update DOM and save preference
+                        document.documentElement.setAttribute('data-theme', newTheme);
+                        localStorage.setItem('error_translator_theme', newTheme);
+                        
+                        // Update theme icon
+                        themeToggle.innerHTML = newTheme === 'dark' 
+                            ? '<i class="fas fa-sun"></i>' 
+                            : '<i class="fas fa-moon"></i>';
+                    } catch (error) {
+                        console.error('Error in theme toggle handler:', error);
+                    }
+                };
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,14 @@
+-r requirements.txt
+
+# Testing framework
+pytest==7.3.1
+pytest-cov==4.1.0
+
+# Flask testing
+pytest-flask==1.2.0
+
+# Selenium testing
+pytest-selenium==4.0.1
+selenium==4.10.0
+webdriver-manager==3.8.6
+py==1.11.0 
