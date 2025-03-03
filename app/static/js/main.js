@@ -890,8 +890,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// TODO: Implement error message validation 
-
 /**
  * Clear all recent searches (for testing purposes)
  */

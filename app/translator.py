@@ -171,8 +171,4 @@ def get_general_response(error_message, language, output_language=None):
         'language': language,
         'explanation': explanation,
         'solution': solution,
-    }
-
-# TODO: Implement more advanced language detection using machine learning
-# TODO: Add functionality to learn from user feedback
-# TODO: Expand the database of error patterns 
+    } 

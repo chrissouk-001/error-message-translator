@@ -177,7 +177,14 @@ To add new error patterns, edit the `app/data/error_patterns.py` file and add a 
 - [ ] Add user feedback mechanism for translations
 - [ ] Support more programming languages
 - [ ] Add ability to share translations via URL
-- [x] Improve test coverage to >90%
+- [ ] Refactor frontend code for better structure.
+- [ ] Add integration tests for new features.
+- [ ] Create documentation for API usage.
+- [ ] Setup CI/CD pipeline.
+- [ ] Integrate caching layer for error translations
+- [ ] Add unit tests for the translate_text function
+- [ ] Optimize performance of regex matching
+- [ ] Implement error message validation in JavaScript
 
 ## 🤝 Contributing
 
