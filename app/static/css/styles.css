@@ -1341,19 +1341,34 @@ html {
 /* Research Notice Banner */
 .research-notice {
     background-color: var(--warning-color);
-    padding: 10px 15px;
-    text-align: center;
+    padding: 12px 20px;
     color: #000;
     font-weight: 500;
     position: relative;
     z-index: 100;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notice-content {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.notice-icon {
+    font-size: 1.2rem;
+    margin-right: 10px;
+    display: inline-block;
 }
 
 .research-notice p {
     margin: 0;
     line-height: 1.5;
+    text-align: left;
 }
 
 .research-notice strong {
@@ -1361,28 +1376,42 @@ html {
 }
 
 .research-notice .notice-close {
-    position: absolute;
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
-    background: none;
+    background: rgba(0, 0, 0, 0.1);
     border: none;
     color: #000;
     cursor: pointer;
-    font-size: 1rem;
-    opacity: 0.7;
-    transition: opacity 0.2s;
-    padding: 5px;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    padding: 6px 10px;
+    margin-left: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.2s ease;
 }
 
 .research-notice .notice-close:hover {
-    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
 }
 
 [data-theme="dark"] .research-notice {
     background-color: var(--warning-color);
     color: #000;
+}
+
+@media (max-width: 600px) {
+    .research-notice {
+        flex-direction: column;
+        padding: 10px 15px;
+    }
+    
+    .notice-content {
+        margin-bottom: 8px;
+    }
+    
+    .research-notice .notice-close {
+        margin-left: 0;
+        align-self: flex-end;
+    }
 } 

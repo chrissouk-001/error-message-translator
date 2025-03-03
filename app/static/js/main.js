@@ -92,23 +92,33 @@ function setupResearchNotice() {
         if (closeButton) {
             closeButton.addEventListener('click', function(e) {
                 e.stopPropagation(); // Prevent the click from propagating
-                researchNotice.style.display = 'none';
+                researchNotice.style.opacity = '0';
+                setTimeout(() => {
+                    researchNotice.style.display = 'none';
+                }, 300);
             });
         }
         
-        // Make notice disappear when user interacts with main content
-        // Using mousedown on the main content areas to avoid immediate dismissal
-        const mainContent = document.querySelector('header');
-        if (mainContent) {
-            mainContent.addEventListener('mousedown', function() {
-                researchNotice.style.display = 'none';
-            }, { once: true });
-        }
+        // Add transition effect for smooth disappearance
+        researchNotice.style.transition = 'opacity 0.3s ease';
+        
+        // Detect scroll past a certain point to dismiss the notice
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 100 && researchNotice.style.display !== 'none') {
+                researchNotice.style.opacity = '0';
+                setTimeout(() => {
+                    researchNotice.style.display = 'none';
+                }, 300);
+            }
+        }, { once: true });
         
         // Alternatively, make it disappear after 15 seconds
         setTimeout(() => {
-            if (researchNotice) {
-                researchNotice.style.display = 'none';
+            if (researchNotice && researchNotice.style.display !== 'none') {
+                researchNotice.style.opacity = '0';
+                setTimeout(() => {
+                    researchNotice.style.display = 'none';
+                }, 300);
             }
         }, 15000);
     }
