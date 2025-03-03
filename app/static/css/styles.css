@@ -1346,11 +1346,13 @@ html {
     font-weight: 500;
     position: relative;
     z-index: 100;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     margin-bottom: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-radius: 4px;
+    margin: 8px 12px 15px;
 }
 
 .notice-content {
@@ -1361,7 +1363,7 @@ html {
 
 .notice-icon {
     font-size: 1.2rem;
-    margin-right: 10px;
+    margin-right: 12px;
     display: inline-block;
 }
 
@@ -1373,6 +1375,18 @@ html {
 
 .research-notice strong {
     font-weight: 700;
+}
+
+.research-notice a {
+    color: #0056b3;
+    text-decoration: underline;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.research-notice a:hover {
+    color: #003d82;
+    text-decoration: underline;
 }
 
 .research-notice .notice-close {
@@ -1400,10 +1414,19 @@ html {
     color: #000;
 }
 
+[data-theme="dark"] .research-notice a {
+    color: #1a73e8;
+}
+
+[data-theme="dark"] .research-notice a:hover {
+    color: #3b8bf4;
+}
+
 @media (max-width: 600px) {
     .research-notice {
         flex-direction: column;
         padding: 10px 15px;
+        margin: 5px 8px 10px;
     }
     
     .notice-content {

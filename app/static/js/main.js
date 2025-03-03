@@ -87,6 +87,13 @@ function init() {
 function setupResearchNotice() {
     const researchNotice = document.querySelector('.research-notice');
     if (researchNotice) {
+        // Check if user has already closed the notice before
+        const noticeHidden = localStorage.getItem('research_notice_hidden') === 'true';
+        if (noticeHidden) {
+            researchNotice.style.display = 'none';
+            return;
+        }
+        
         // Add a click event to the close button
         const closeButton = researchNotice.querySelector('.notice-close');
         if (closeButton) {
@@ -95,32 +102,45 @@ function setupResearchNotice() {
                 researchNotice.style.opacity = '0';
                 setTimeout(() => {
                     researchNotice.style.display = 'none';
+                    // Remember that user closed the notice
+                    localStorage.setItem('research_notice_hidden', 'true');
                 }, 300);
             });
         }
+        
+        // Add hover effect for better UX
+        researchNotice.addEventListener('mouseenter', function() {
+            closeButton.style.opacity = '1';
+        });
+        
+        researchNotice.addEventListener('mouseleave', function() {
+            closeButton.style.opacity = '0.7';
+        });
         
         // Add transition effect for smooth disappearance
         researchNotice.style.transition = 'opacity 0.3s ease';
         
         // Detect scroll past a certain point to dismiss the notice
         window.addEventListener('scroll', function() {
-            if (window.scrollY > 100 && researchNotice.style.display !== 'none') {
+            if (window.scrollY > 150 && researchNotice.style.display !== 'none') {
                 researchNotice.style.opacity = '0';
                 setTimeout(() => {
                     researchNotice.style.display = 'none';
+                    // Don't save to localStorage if just scrolled away
                 }, 300);
             }
         }, { once: true });
         
-        // Alternatively, make it disappear after 15 seconds
+        // Alternatively, make it disappear after 20 seconds
         setTimeout(() => {
             if (researchNotice && researchNotice.style.display !== 'none') {
                 researchNotice.style.opacity = '0';
                 setTimeout(() => {
                     researchNotice.style.display = 'none';
+                    // Don't save to localStorage if auto-dismissed
                 }, 300);
             }
-        }, 15000);
+        }, 20000);
     }
 }
 
