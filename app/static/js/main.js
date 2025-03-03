@@ -97,8 +97,17 @@ function setupResearchNotice() {
         // Add a click event to the close button
         const closeButton = researchNotice.querySelector('.notice-close');
         if (closeButton) {
+            // Make sure button is visible and clickable
+            closeButton.style.display = 'flex';
+            closeButton.style.opacity = '1';
+            closeButton.style.pointerEvents = 'auto';
+            
             closeButton.addEventListener('click', function(e) {
+                e.preventDefault();
                 e.stopPropagation(); // Prevent the click from propagating
+                console.log('Research notice close button clicked');
+                
+                // Fade out and hide the notice
                 researchNotice.style.opacity = '0';
                 setTimeout(() => {
                     researchNotice.style.display = 'none';
@@ -108,13 +117,17 @@ function setupResearchNotice() {
             });
         }
         
+        // Make the notice visible (in case CSS has opacity 0)
+        researchNotice.style.opacity = '1';
+        researchNotice.style.display = 'flex';
+        
         // Add hover effect for better UX
         researchNotice.addEventListener('mouseenter', function() {
-            closeButton.style.opacity = '1';
+            if (closeButton) closeButton.style.opacity = '1';
         });
         
         researchNotice.addEventListener('mouseleave', function() {
-            closeButton.style.opacity = '0.7';
+            if (closeButton) closeButton.style.opacity = '0.7';
         });
         
         // Add transition effect for smooth disappearance
