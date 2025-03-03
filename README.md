@@ -197,7 +197,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Thanks to all the beginner developers whose struggles inspired this project
 - All open-source libraries and tools used in this project
-
----
-
-Made with ❤️ for beginner developers 
