@@ -2,11 +2,11 @@
 
 A web application designed to help beginner developers understand cryptic error messages by translating them into plain, understandable language with practical solutions.
 
-> **⚠️ Research Notice**: This project is for research purposes to evaluate how Large Language Models (LLMs) perform on software development projects. Everyone is welcome to contribute to this repository as part of this research test.
+> **Research Notice**: This project is for research purposes to evaluate how Large Language Models (LLMs) perform on software development projects. Everyone is welcome to contribute to this repository as part of this research test.
 
 ![Error Message Translator Screenshot](screenshots/app_screenshot.png)
 
-## 🎯 Features
+## Features
 
 - **Error Message Translation**: Converts complex error messages into beginner-friendly explanations
 - **Multi-language Support**: Works with Python, JavaScript, HTML, and CSS errors
@@ -15,21 +15,21 @@ A web application designed to help beginner developers understand cryptic error 
 - **Recent Searches**: Keep track of your recently translated errors
 - **Responsive Design**: Works well on desktop and mobile devices
 
-## 🚀 Tech Stack
+## Tech Stack
 
 - **Frontend**: HTML, CSS, JavaScript
 - **Backend**: Python with Flask
 - **Storage**: Browser localStorage for recent searches
 - **Testing**: pytest for unit and integration tests, Selenium for frontend tests
 
-## 📋 Prerequisites
+## Prerequisites
 
 Before running this application, you need to have the following installed:
 
 - Python 3.8 or higher
 - pip (Python package manager)
 
-## 🛠️ Installation
+## Installation
 
 1. Clone the repository:
    ```bash
@@ -57,7 +57,7 @@ Before running this application, you need to have the following installed:
    pip install -r requirements-test.txt
    ```
 
-## 🏃‍♂️ Running the Application
+## Running the Application
 
 1. Start the Flask server:
    ```bash
@@ -69,7 +69,7 @@ Before running this application, you need to have the following installed:
    http://localhost:5001
    ```
 
-## 🧪 Testing
+## Testing
 
 The application includes comprehensive test coverage with pytest:
 
@@ -115,14 +115,14 @@ The application includes comprehensive test coverage with pytest:
    ./run_selenium_tests.sh --searches-only
    ```
 
-## 🧩 How It Works
+## How It Works
 
 1. The app analyzes error messages using regular expressions to identify patterns.
 2. It matches these patterns against a database of known error templates.
 3. When a match is found, it generates a beginner-friendly explanation and solution.
 4. The matched components of the error are integrated into the explanation for context.
 
-## 🌳 Project Structure
+## Project Structure
 
 ```
 error-message-translator/
@@ -153,7 +153,7 @@ error-message-translator/
 └── screenshots/            # Project screenshots
 ```
 
-## 🔍 Extending the Error Database
+## Extending the Error Database
 
 To add new error patterns, edit the `app/data/error_patterns.py` file and add a new pattern following the existing structure:
 
@@ -170,7 +170,7 @@ To add new error patterns, edit the `app/data/error_patterns.py` file and add a 
 }
 ```
 
-## 📝 Todo List
+## Todo List
 
 - [ ] Add syntax highlighting for code examples
 - [ ] Implement more advanced language detection
@@ -186,7 +186,7 @@ To add new error patterns, edit the `app/data/error_patterns.py` file and add a 
 - [ ] Optimize performance of regex matching
 - [ ] Implement error message validation in JavaScript
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! If you'd like to add more error patterns or improve the application:
 
@@ -196,11 +196,11 @@ Contributions are welcome! If you'd like to add more error patterns or improve t
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📜 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🌟 Acknowledgements
+## Acknowledgements
 
 - Thanks to all the beginner developers whose struggles inspired this project
 - All open-source libraries and tools used in this project
