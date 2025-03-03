@@ -2,6 +2,8 @@
 
 A web application designed to help beginner developers understand cryptic error messages by translating them into plain, understandable language with practical solutions.
 
+> **⚠️ Research Notice**: This project is for research purposes to evaluate how Large Language Models (LLMs) perform on software development projects. Everyone is welcome to contribute to this repository as part of this research test.
+
 ![Error Message Translator Screenshot](screenshots/app_screenshot.png)
 
 ## 🎯 Features
