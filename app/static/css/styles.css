@@ -204,7 +204,7 @@ header .tagline {
 
 .theme-toggle {
     position: fixed;
-    top: 80px;
+    top: 120px;
     right: 20px;
     background-color: var(--accent-color);
     color: white;
@@ -224,7 +224,7 @@ header .tagline {
 /* Adjust for mobile devices */
 @media (max-width: 600px) {
     .theme-toggle {
-        top: 90px;
+        top: 130px;
         right: 15px;
         width: 35px;
         height: 35px;
