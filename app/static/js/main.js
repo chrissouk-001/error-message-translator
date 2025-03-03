@@ -38,6 +38,9 @@ function init() {
     // Fetch the programming languages
     fetchLanguages();
     
+    // Setup research notice to disappear on user interaction
+    setupResearchNotice();
+    
     // Load recent searches
     loadRecentSearches();
     
@@ -76,6 +79,39 @@ function init() {
     window.copyResultToClipboard = copyResultToClipboard;
     
     console.log('All global functions exposed to window object');
+}
+
+/**
+ * Set up the research notice to disappear on user interaction
+ */
+function setupResearchNotice() {
+    const researchNotice = document.querySelector('.research-notice');
+    if (researchNotice) {
+        // Add a click event to the close button
+        const closeButton = researchNotice.querySelector('.notice-close');
+        if (closeButton) {
+            closeButton.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent the click from propagating
+                researchNotice.style.display = 'none';
+            });
+        }
+        
+        // Make notice disappear when user interacts with main content
+        // Using mousedown on the main content areas to avoid immediate dismissal
+        const mainContent = document.querySelector('header');
+        if (mainContent) {
+            mainContent.addEventListener('mousedown', function() {
+                researchNotice.style.display = 'none';
+            }, { once: true });
+        }
+        
+        // Alternatively, make it disappear after 15 seconds
+        setTimeout(() => {
+            if (researchNotice) {
+                researchNotice.style.display = 'none';
+            }
+        }, 15000);
+    }
 }
 
 /**
