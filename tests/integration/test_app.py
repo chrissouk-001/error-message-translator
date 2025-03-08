@@ -1,31 +1,31 @@
 """
 Integration tests for the Flask application.
 """
-import unittest
-import json
-from app import app
+import pytest
+import sys
+import os
 
+# Add parent directory to path to allow imports when running tests directly
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-class TestApp(unittest.TestCase):
-    """Test cases for the Flask application."""
+try:
+    from app import app
+except ImportError as e:
+    print(f"Import error: {e}")
+    print("Current path:", sys.path)
+    raise
 
-    def setUp(self):
-        """Set up test client."""
-        self.app = app.test_client()
-        self.app.testing = True
+def test_home_page(client):
+    """Test home page loads properly."""
+    response = client.get('/')
+    assert response.status_code == 200
+    assert b'<!DOCTYPE html>' in response.data
+    assert b'Error Message Translator' in response.data
 
-    def test_home_page(self):
-        """Test home page loads properly."""
-        response = self.app.get('/')
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b'<!DOCTYPE html>', response.data)
-        self.assertIn(b'Error Message Translator', response.data)
-
-    def test_not_found(self):
-        """Test 404 handling."""
-        response = self.app.get('/nonexistent-route')
-        self.assertEqual(response.status_code, 404)
-
+def test_not_found(client):
+    """Test 404 handling."""
+    response = client.get('/nonexistent-route')
+    assert response.status_code == 404
 
 if __name__ == "__main__":
-    unittest.main() 
+    pytest.main() 

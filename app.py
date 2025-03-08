@@ -1,18 +1,16 @@
-from flask import Flask, render_template, request
-from pathlib import Path
-import os
+"""
+Entry point for the Flask application.
+
+This file serves as the entry point for running the Error Message Translator application.
+"""
 import argparse
-from app.translator import translate_error, detect_language
-from app.data.error_patterns import PYTHON_PATTERNS, JAVASCRIPT_PATTERNS, HTML_PATTERNS, CSS_PATTERNS
+from app import app
 
-# Define the Flask app
-app = Flask(__name__, 
-            static_folder='app/static',
-            template_folder='app/templates')
-
+# Register routes
 @app.route('/')
 def index():
     """Render the main page of the application."""
+    from flask import render_template
     return render_template('index.html')
 
 if __name__ == '__main__':
