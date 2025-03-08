@@ -1,6 +1,6 @@
 # How to Contribute
 
-> **⚠️ Research Notice**: This project is for research purposes to evaluate how Large Language Models (LLMs) perform on software development projects. Everyone is welcome to contribute to this repository as part of this research test.
+> **Research Notice**: This project is for research purposes to evaluate how Large Language Models (LLMs) perform on software development projects. Everyone is welcome to contribute to this repository as part of this research test.
 
 This is a research project testing how LLMs work with code. We welcome all kinds of contributions!
 
