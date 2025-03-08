@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
     name="error-message-translator",
     version="0.1.0",
-    author="Chris Soukoulis",
+    author="chrisdvz.io",
     author_email="csoukoulis.tech@gmail.com",
     description="A web application that translates cryptic error messages into beginner-friendly explanations",
     long_description=long_description,
