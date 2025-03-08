@@ -12,7 +12,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Flask application for translating error messages
 - Support for Python, JavaScript, HTML, and CSS errors
 - Testing infrastructure with pytest
-- CI workflow with GitHub Actions
 - Linting and formatting with flake8 and black
 - Packaging with setuptools
 - Developer documentation

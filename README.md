@@ -1,6 +1,5 @@
 # Error Message Translator
 
-[![CI](https://github.com/chrissouk-001/error-message-translator/actions/workflows/ci.yml/badge.svg)](https://github.com/chrissouk-001/error-message-translator/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
@@ -27,7 +26,6 @@ The Error Message Translator provides a clean, intuitive interface for translati
 - **Backend**: Python with Flask
 - **Storage**: Browser localStorage for recent searches
 - **Testing**: pytest with coverage reporting
-- **CI/CD**: GitHub Actions
 - **Code Quality**: flake8, black, pre-commit hooks
 
 ## Prerequisites
@@ -148,11 +146,6 @@ error-message-translator/
 ├── tests/                  # Test suite
 │   ├── unit/               # Unit tests
 │   └── integration/        # Integration tests
-├── .github/                # GitHub configuration
-│   ├── workflows/          # GitHub Actions workflows
-│   │   └── ci.yml          # CI configuration
-│   ├── ISSUE_TEMPLATE/     # Issue templates
-│   └── PULL_REQUEST_TEMPLATE.md  # PR template
 ├── app.py                  # Application entry point
 ├── setup.py                # Package setup
 ├── pyproject.toml          # Project configuration
@@ -167,49 +160,3 @@ error-message-translator/
 ├── LICENSE                 # MIT License
 └── README.md               # This file
 ```
-
-## Extending the Error Database
-
-To add new error patterns, edit the `app/data/error_patterns.py` file and add a new pattern following the existing structure:
-
-```python
-{
-    'regex': r'YourRegexPattern',
-    'title': 'Error Title',
-    'explanation': 'Beginner-friendly explanation',
-    'solution': 'How to fix the error',
-    'code_example': '''
-# Example code showing the fix
-    ''',
-    'related_errors': ['Related', 'Errors']
-}
-```
-
-After adding patterns, run the tests to ensure they work correctly:
-
-```bash
-pytest tests/unit/test_translator.py
-```
-
-## Contributing
-
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-The development workflow is:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Run tests and linting (`make test` and `make lint`)
-5. Commit your changes (`git commit -m 'Add some amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgements
-
-- Thanks to all the beginner developers whose struggles inspired this project
-- All open-source libraries and tools used in this project

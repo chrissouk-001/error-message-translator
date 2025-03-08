@@ -6,13 +6,11 @@ This is a research project testing how LLMs work with code. We welcome all kinds
 
 ## Quick Start
 
-1. Fork the repo
-2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/error-message-translator.git`
-3. Create a branch for your changes: `git checkout -b your-feature`
-4. Make changes
-5. Test if possible: `./run_tests.sh`
-6. Push your branch: `git push origin your-feature`
-7. Open a Pull Request
+1. Clone the repository: `git clone https://github.com/chrissouk-001/error-message-translator.git`
+2. Create a branch for your changes: `git checkout -b your-feature`
+3. Make changes
+4. Test with pytest: `pytest`
+5. Make a pull request with your changes
 
 ## What Can You Contribute?
 
@@ -27,7 +25,7 @@ This is a research project testing how LLMs work with code. We welcome all kinds
 
 ```bash
 # Clone and set up
-git clone https://github.com/YOUR_USERNAME/error-message-translator.git
+git clone https://github.com/chrissouk-001/error-message-translator.git
 cd error-message-translator
 
 # Create virtual environment
@@ -35,7 +33,8 @@ python -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 # Install dependencies
-pip install -r requirements-test.txt
+pip install -r requirements.txt
+pip install -e ".[dev]"  # For development dependencies
 
 # Run the app
 python app.py
@@ -43,7 +42,11 @@ python app.py
 
 ## Running Tests
 ```bash
-./run_tests.sh
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=app
 ```
 
 Thanks for contributing to this research project! 
