@@ -15,8 +15,10 @@ if project_root not in sys.path:
 
 # Silence deprecation warnings during testing
 import warnings
+
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
+
 
 @pytest.fixture(scope="session")
 def app():
@@ -25,16 +27,19 @@ def app():
     from app import app
 
     # Configure the app for testing
-    app.config.update({
-        "TESTING": True,
-        "SERVER_NAME": "localhost.localdomain",
-        "DEBUG": False,
-        "WTF_CSRF_ENABLED": False,
-    })
+    app.config.update(
+        {
+            "TESTING": True,
+            "SERVER_NAME": "localhost.localdomain",
+            "DEBUG": False,
+            "WTF_CSRF_ENABLED": False,
+        }
+    )
 
     # Create app context for testing
     with app.app_context():
         yield app
+
 
 @pytest.fixture
 def client(app):
@@ -43,7 +48,8 @@ def client(app):
         client.environ_base["HTTP_ACCEPT"] = "text/html"
         yield client
 
+
 @pytest.fixture
 def runner(app):
     """Create a CLI test runner for the Flask app."""
-    return app.test_cli_runner() 
+    return app.test_cli_runner()

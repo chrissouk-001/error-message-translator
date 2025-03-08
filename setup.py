@@ -51,4 +51,4 @@ setup(
         "app": ["templates/*.html", "static/css/*.css", "static/js/*.js"],
     },
     zip_safe=False,
-) 
+)
