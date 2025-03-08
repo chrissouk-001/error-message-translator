@@ -2,18 +2,8 @@
 Integration tests for the Flask application.
 """
 import pytest
-import sys
-import os
 
-# Add parent directory to path to allow imports when running tests directly
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-
-try:
-    from app import app
-except ImportError as e:
-    print(f"Import error: {e}")
-    print("Current path:", sys.path)
-    raise
+# No need for manual import path manipulation - that's handled in conftest.py
 
 def test_home_page(client):
     """Test home page loads properly."""

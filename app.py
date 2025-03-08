@@ -13,9 +13,13 @@ def index():
     from flask import render_template
     return render_template('index.html')
 
-if __name__ == '__main__':
+def main():
+    """Run the Flask application."""
     parser = argparse.ArgumentParser(description='Run the Error Message Translator app')
     parser.add_argument('--port', type=int, default=5001, help='Port to run the app on')
     args = parser.parse_args()
     
-    app.run(debug=True, port=args.port) 
+    app.run(debug=True, port=args.port)
+
+if __name__ == '__main__':
+    main() 

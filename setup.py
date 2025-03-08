@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
     name="error-message-translator",
     version="0.1.0",
-    author="chrisdvz.io",
+    author="Chris Soukoulis",
     author_email="csoukoulis.tech@gmail.com",
     description="A web application that translates cryptic error messages into beginner-friendly explanations",
     long_description=long_description,
@@ -15,18 +15,23 @@ setup(
     packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "Intended Audience :: Education",
         "Topic :: Software Development :: Debuggers",
+        "Framework :: Flask",
     ],
     python_requires=">=3.8",
     install_requires=[
         "Flask>=2.0.0",
         "Werkzeug>=2.0.0",
         "Jinja2>=3.0.0",
+        "python-dotenv>=0.19.0",
     ],
     extras_require={
         "dev": [
@@ -38,9 +43,12 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "error-translator=app:main",
+            "error-translator=app.app:main",
         ],
     },
     include_package_data=True,
+    package_data={
+        "app": ["templates/*.html", "static/css/*.css", "static/js/*.js"],
+    },
     zip_safe=False,
 ) 

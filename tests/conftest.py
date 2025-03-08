@@ -13,19 +13,35 @@ project_root = str(Path(__file__).parent.parent.absolute())
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-@pytest.fixture
+# Silence deprecation warnings during testing
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
+
+@pytest.fixture(scope="session")
 def app():
     """Create a Flask app instance for testing."""
+    # Import inside function to avoid import issues
     from app import app
+
+    # Configure the app for testing
     app.config.update({
         "TESTING": True,
+        "SERVER_NAME": "localhost.localdomain",
+        "DEBUG": False,
+        "WTF_CSRF_ENABLED": False,
     })
-    yield app
+
+    # Create app context for testing
+    with app.app_context():
+        yield app
 
 @pytest.fixture
 def client(app):
     """Create a test client for the Flask app."""
-    return app.test_client()
+    with app.test_client() as client:
+        client.environ_base["HTTP_ACCEPT"] = "text/html"
+        yield client
 
 @pytest.fixture
 def runner(app):
