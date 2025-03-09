@@ -6,11 +6,20 @@ This is a research project testing how LLMs work with code. We welcome all kinds
 
 ## Quick Start
 
-1. Clone the repository: `git clone https://github.com/chrissouk-001/error-message-translator.git`
-2. Create a branch for your changes: `git checkout -b your-feature`
-3. Make changes
-4. Test with pytest: `pytest`
-5. Make a pull request with your changes
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/chrissouk-001/error-message-translator.git
+   ```
+2. Create a new branch for your feature or fix:
+   ```bash
+   git checkout -b your-feature
+   ```
+3. Implement your changes.
+4. Run tests to ensure everything works:
+   ```bash
+   pytest
+   ```
+5. Submit a pull request with a clear description of your changes.
 
 ## What Can You Contribute?
 

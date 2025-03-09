@@ -160,3 +160,11 @@ error-message-translator/
 ├── LICENSE                 # MIT License
 └── README.md               # This file
 ```
+
+## TODOs
+
+- [ ] Implement additional language support (e.g., Java, Ruby)
+- [ ] Enhance error detection accuracy
+- [ ] Add user authentication and profile management
+- [ ] Integrate with popular IDEs and code editors
+- [ ] Improve mobile responsiveness and accessibility
