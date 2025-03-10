@@ -163,7 +163,7 @@ error-message-translator/
 
 ## TODOs
 
-- [ ] Implement additional language support (e.g., Java, Ruby)
+- [x] Implement additional language support (added Java)
 - [ ] Enhance error detection accuracy
 - [ ] Add user authentication and profile management
 - [ ] Integrate with popular IDEs and code editors

@@ -563,6 +563,8 @@ function getPrismLanguageClass(language) {
             return 'markup';
         case 'css':
             return 'css';
+        case 'java':
+            return 'java';
         default:
             return 'none';
     }

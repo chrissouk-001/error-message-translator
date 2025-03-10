@@ -1034,3 +1034,141 @@ with open("large_file.txt", "r") as file:
 """,
     },
 ]
+
+# Java error patterns
+JAVA_PATTERNS = [
+    {
+        "regex": r"cannot find symbol\s*\n\s*symbol:\s*(.*)\s*\n\s*location:\s*(.*)",
+        "title": "Java Symbol Not Found Error",
+        "explanation": "This error occurs when Java cannot find a referenced symbol (variable, method, class) in the specified location. The compiler is looking for {{$1}} in {{$2}} but it can't find it.",
+        "solution": "Check for typos in the symbol name. Make sure the symbol is properly declared and accessible from the location where it's being used. Verify that all necessary imports are present.",
+        "difficulty": "beginner",
+        "code_example": """
+// Example fix for a common 'cannot find symbol' error
+import java.util.ArrayList; // Missing import
+
+public class Example {
+    public void method() {
+        ArrayList<String> list = new ArrayList<>(); // Now it works
+    }
+}
+"""
+    },
+    {
+        "regex": r"incompatible types: (.*) cannot be converted to (.*)",
+        "title": "Java Type Conversion Error",
+        "explanation": "Java is strongly typed and cannot automatically convert between incompatible types. You're trying to assign a value of type {{$1}} to a variable of type {{$2}}.",
+        "solution": "You need to either use compatible types or explicitly cast the value to the required type if it's a valid conversion. In some cases, you might need to use appropriate conversion methods.",
+        "difficulty": "beginner",
+        "code_example": """
+// Example fix for incompatible types
+String numberStr = "123";
+int number = Integer.parseInt(numberStr); // Convert String to int correctly
+"""
+    },
+    {
+        "regex": r"java.lang.NullPointerException(?:\s*:\s*(.*))?",
+        "title": "Java Null Pointer Exception",
+        "explanation": "This occurs when your program tries to use an object reference that has a null value. You're trying to access a method or property of an object that doesn't exist in memory.",
+        "solution": "Always check if objects are null before using them. Find where the null value is coming from and initialize the object properly before using it.",
+        "difficulty": "beginner",
+        "code_example": """
+// Example fix for NullPointerException
+if (myObject != null) {
+    myObject.doSomething(); // Only call method if object exists
+}
+"""
+    },
+    {
+        "regex": r"illegal start of expression",
+        "title": "Java Syntax Error: Illegal Start of Expression",
+        "explanation": "Java encountered code it couldn't parse because the syntax is incorrect. This often happens due to mismatched brackets, missing semicolons, or writing code in an invalid location.",
+        "solution": "Check for missing closing brackets (}, ), or ]). Verify that all statements end with semicolons. Make sure you're not placing code outside of methods or blocks where it doesn't belong.",
+        "difficulty": "beginner"
+    },
+    {
+        "regex": r"java.lang.ArrayIndexOutOfBoundsException: (\d+)",
+        "title": "Java Array Index Out of Bounds Exception",
+        "explanation": "You're trying to access an array element at index {{$1}}, but this index doesn't exist in the array. Arrays in Java are zero-indexed, meaning the first element is at index 0.",
+        "solution": "Check your array bounds and make sure you're not trying to access elements that don't exist. Verify your loop conditions when iterating through arrays.",
+        "difficulty": "beginner",
+        "code_example": """
+// Example fix for ArrayIndexOutOfBoundsException
+int[] array = new int[5]; // Array with indices 0-4
+for (int i = 0; i < array.length; i++) { // Use array.length, not a hardcoded value
+    array[i] = i; // This is safe
+}
+"""
+    },
+    {
+        "regex": r"class, interface, or enum expected",
+        "title": "Java Syntax Error: Class, Interface, or Enum Expected",
+        "explanation": "The Java compiler expected to find a class, interface, or enum declaration but found something else. This typically happens when you have mismatched braces in your code.",
+        "solution": "Check for missing or mismatched curly braces {}. Make sure each opening brace has a corresponding closing brace. Verify that all classes, methods, and blocks are properly closed.",
+        "difficulty": "beginner"
+    },
+    {
+        "regex": r"unreported exception (.*); must be caught or declared to be thrown",
+        "title": "Java Uncaught Exception Error",
+        "explanation": "Your code is generating a checked exception ({{$1}}) that isn't being handled. In Java, checked exceptions must either be caught in a try-catch block or declared in the method signature with a throws clause.",
+        "solution": "Either wrap the code in a try-catch block to handle the exception, or add a 'throws' clause to the method declaration to pass the exception up the call stack.",
+        "difficulty": "intermediate",
+        "code_example": """
+// Option 1: Handle with try-catch
+try {
+    riskyOperation(); // Method that might throw an exception
+} catch (IOException e) {
+    System.out.println("Error: " + e.getMessage());
+}
+
+// Option 2: Declare exception in method signature
+public void myMethod() throws IOException {
+    riskyOperation();
+}
+"""
+    },
+    {
+        "regex": r"variable (.*) might not have been initialized",
+        "title": "Java Uninitialized Variable Error",
+        "explanation": "You're trying to use the local variable {{$1}} before it has been initialized with a value. Java requires all local variables to be assigned values before they are used.",
+        "solution": "Initialize the variable with a value when you declare it, or make sure it's assigned a value in all possible code paths before it's used.",
+        "difficulty": "beginner",
+        "code_example": """
+// Correct initialization of local variables
+int number = 0; // Initialize with default value
+String text = ""; // Initialize with empty string
+Object obj = null; // Initialize with null
+"""
+    },
+    {
+        "regex": r"java.lang.ClassCastException: (.*) cannot be cast to (.*)",
+        "title": "Java Class Cast Exception",
+        "explanation": "You're trying to cast an object of type {{$1}} to type {{$2}}, but this cast is not valid. The object is not an instance of the target class or any of its subclasses.",
+        "solution": "Check that the object is actually of the type you're trying to cast it to. Use the 'instanceof' operator to verify an object's type before casting it.",
+        "difficulty": "intermediate",
+        "code_example": """
+// Safe casting with instanceof check
+if (myObject instanceof TargetClass) {
+    TargetClass typedObject = (TargetClass) myObject; // Safe cast
+    typedObject.doSomething();
+}
+"""
+    },
+    {
+        "regex": r"method (.*) in class (.*) cannot be applied to given types",
+        "title": "Java Method Invocation Error",
+        "explanation": "You're calling the method {{$1}} from class {{$2}} with incorrect parameter types. The method exists, but the arguments you're providing don't match any available method signature.",
+        "solution": "Check the documentation or declaration of the method to see which parameter types it expects. Adjust your method call to provide compatible arguments.",
+        "difficulty": "intermediate"
+    }
+]
+
+# Update ERROR_PATTERNS dictionary to include Java
+ERROR_PATTERNS = {
+    "python": PYTHON_PATTERNS,
+    "javascript": JAVASCRIPT_PATTERNS,
+    "html": HTML_PATTERNS,
+    "css": CSS_PATTERNS,
+    "java": JAVA_PATTERNS,  # Add Java patterns
+    "general": GENERAL_PATTERNS,
+}

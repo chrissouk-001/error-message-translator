@@ -12,6 +12,7 @@ from app.data.error_patterns import (
     JAVASCRIPT_PATTERNS,
     HTML_PATTERNS,
     CSS_PATTERNS,
+    JAVA_PATTERNS,
     GENERAL_PATTERNS,
 )
 
@@ -21,6 +22,7 @@ ERROR_PATTERNS = {
     "javascript": JAVASCRIPT_PATTERNS,
     "html": HTML_PATTERNS,
     "css": CSS_PATTERNS,
+    "java": JAVA_PATTERNS,
     "general": GENERAL_PATTERNS,
 }
 
@@ -47,7 +49,7 @@ def detect_language(error_message):
         error_message (str): The error message to analyze
 
     Returns:
-        str: The detected language ('python', 'javascript', 'html', 'css', or 'general')
+        str: The detected language ('python', 'javascript', 'html', 'css', 'java', or 'general')
     """
     # First try Python patterns (most common)
     for pattern in PYTHON_PATTERNS:
@@ -58,6 +60,11 @@ def detect_language(error_message):
     for pattern in JAVASCRIPT_PATTERNS:
         if re.search(pattern["regex"], error_message, re.IGNORECASE):
             return "javascript"
+
+    # Then try Java patterns
+    for pattern in JAVA_PATTERNS:
+        if re.search(pattern["regex"], error_message, re.IGNORECASE):
+            return "java"
 
     # Then try HTML patterns
     for pattern in HTML_PATTERNS:
@@ -168,6 +175,7 @@ def get_general_response(error_message, language, output_language=None):
         "javascript": "JavaScript Error",
         "html": "HTML Error",
         "css": "CSS Error",
+        "java": "Java Error",
         "general": "Code Error",
     }
 
