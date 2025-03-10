@@ -34,7 +34,6 @@ Before running this application, you need to have the following installed:
 
 - Python 3.8 or higher
 - pip (Python package manager)
-- Make (optional, for using Makefile commands)
 
 ## Installation
 
@@ -77,9 +76,6 @@ This project follows standard Python development practices:
 ```bash
 # Using Python directly
 python app.py
-
-# Using the Makefile
-make run
 ```
 
 The application will be available at [http://localhost:5001](http://localhost:5001).
@@ -92,9 +88,6 @@ pytest
 
 # With coverage
 pytest --cov=app
-
-# Using the Makefile
-make test
 ```
 
 ### Code Formatting and Linting
@@ -105,28 +98,9 @@ black --check app tests
 
 # Format code with Black
 black app tests
-# or
-make format
 
 # Run linting checks
 flake8 app tests
-# or
-make lint
-```
-
-### Using the Makefile
-
-The project includes a Makefile for common development tasks:
-
-```bash
-# View available commands
-make help
-
-# Run all quality checks
-make lint
-
-# Clean up Python cache files
-make clean
 ```
 
 ## Project Structure
@@ -151,7 +125,6 @@ error-message-translator/
 ├── pyproject.toml          # Project configuration
 ├── pytest.ini              # pytest configuration
 ├── requirements.txt        # Dependencies
-├── Makefile                # Development tasks
 ├── .pre-commit-config.yaml # Pre-commit hooks configuration
 ├── .flake8                 # flake8 configuration
 ├── .editorconfig           # Editor configuration
