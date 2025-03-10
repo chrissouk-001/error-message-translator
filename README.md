@@ -163,8 +163,13 @@ error-message-translator/
 
 ## TODOs
 
-- [x] Implement additional language support (added Java)
-- [ ] Enhance error detection accuracy
+- [x] Implement additional language support (added Java and Ruby)
+- [x] Enhance error detection accuracy (improved with weighted scoring system)
+- [x] Improve mobile responsiveness and accessibility
 - [ ] Add user authentication and profile management
 - [ ] Integrate with popular IDEs and code editors
-- [ ] Improve mobile responsiveness and accessibility
+- [ ] Create an API documentation page
+- [ ] Add support for command-line errors (Bash, PowerShell)
+- [ ] Implement internationalization (i18n) for multiple languages
+- [ ] Add error analytics and statistics dashboard
+- [ ] Enable browser extension development

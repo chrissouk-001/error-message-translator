@@ -6,6 +6,41 @@
 * It is organized using a modified BEM (Block, Element, Modifier) approach.
 */
 
+/* Accessibility Helpers */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Focus styles for keyboard users */
+:focus {
+    outline: 2px solid #4a90e2;
+    outline-offset: 2px;
+}
+
+/* Skip to content link for keyboard users */
+.skip-to-content {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: #2c3e50;
+    color: white;
+    padding: 8px;
+    z-index: 100;
+    transition: top 0.3s;
+}
+
+.skip-to-content:focus {
+    top: 0;
+}
+
 /* ===== RESET AND BASE STYLES ===== */
 * {
     margin: 0;
@@ -933,13 +968,27 @@ footer a:hover {
 
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 768px) {
+    .container {
+        padding: 0 10px;
+    }
+    
+    .language-options {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .language-selector {
+        width: 100%;
+    }
+    
     .button-group {
         flex-direction: column;
+        width: 100%;
     }
     
     .button-group button {
         width: 100%;
-        margin-bottom: var(--spacing-xs);
+        margin: 5px 0;
     }
     
     .translation-header {
@@ -947,27 +996,12 @@ footer a:hover {
         align-items: flex-start;
     }
     
-    .error-title {
-        margin-bottom: var(--spacing-sm);
-        margin-right: 0;
+    .badges-container {
+        margin-top: 10px;
     }
     
-    .language-badge {
-        margin-bottom: var(--spacing-sm);
-    }
-    
-    .share-container {
-        margin-left: 0;
-        margin-top: var(--spacing-sm);
+    .title-language-container {
         width: 100%;
-    }
-    
-    .share-btn {
-        width: 100%;
-    }
-    
-    .searches-container {
-        grid-template-columns: 1fr;
     }
 }
 
@@ -1469,4 +1503,36 @@ html {
 
 [data-theme="dark"] .research-notice a:hover {
     color: #3b8bf4;
+}
+
+/* High contrast mode for accessibility */
+@media (prefers-contrast: high) {
+    :root {
+        --primary-color: #000080;
+        --accent-color: #800000;
+        --text-color: #000000;
+        --bg-color: #ffffff;
+    }
+    
+    .language-badge,
+    .difficulty-badge {
+        border: 2px solid black;
+    }
+    
+    button {
+        border: 2px solid black;
+    }
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.001s !important;
+        transition-duration: 0.001s !important;
+    }
+    
+    .fade-in {
+        opacity: 1 !important;
+        transform: none !important;
+    }
 } 

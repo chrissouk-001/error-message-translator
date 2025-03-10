@@ -13,6 +13,7 @@ from app.data.error_patterns import (
     HTML_PATTERNS,
     CSS_PATTERNS,
     JAVA_PATTERNS,
+    RUBY_PATTERNS,
     GENERAL_PATTERNS,
 )
 
@@ -23,6 +24,7 @@ ERROR_PATTERNS = {
     "html": HTML_PATTERNS,
     "css": CSS_PATTERNS,
     "java": JAVA_PATTERNS,
+    "ruby": RUBY_PATTERNS,
     "general": GENERAL_PATTERNS,
 }
 
@@ -49,35 +51,74 @@ def detect_language(error_message):
         error_message (str): The error message to analyze
 
     Returns:
-        str: The detected language ('python', 'javascript', 'html', 'css', 'java', or 'general')
+        str: The detected language ('python', 'javascript', 'html', 'css', 'java', 'ruby', or 'general')
     """
-    # First try Python patterns (most common)
-    for pattern in PYTHON_PATTERNS:
-        if re.search(pattern["regex"], error_message, re.IGNORECASE):
-            return "python"
-
-    # Then try JavaScript patterns
-    for pattern in JAVASCRIPT_PATTERNS:
-        if re.search(pattern["regex"], error_message, re.IGNORECASE):
-            return "javascript"
-
-    # Then try Java patterns
-    for pattern in JAVA_PATTERNS:
-        if re.search(pattern["regex"], error_message, re.IGNORECASE):
-            return "java"
-
-    # Then try HTML patterns
-    for pattern in HTML_PATTERNS:
-        if re.search(pattern["regex"], error_message, re.IGNORECASE):
-            return "html"
-
-    # Finally try CSS patterns
-    for pattern in CSS_PATTERNS:
-        if re.search(pattern["regex"], error_message, re.IGNORECASE):
-            return "css"
-
-    # Default to general if no language-specific patterns match
-    return "general"
+    # Initialize counters for each language
+    language_scores = {
+        "python": 0,
+        "javascript": 0,
+        "java": 0,
+        "html": 0,
+        "css": 0,
+        "ruby": 0,
+    }
+    
+    # Common language-specific keywords to boost detection confidence
+    language_keywords = {
+        "python": ["python", "pyfile", "pythonpath", "traceback", "def ", "class ", "import ", "syntaxerror", "indentationerror", "valueerror", "typeerror", "importerror", "attributeerror"],
+        "javascript": ["javascript", "js", "node", "npm", "const ", "let ", "var ", "undefined", "referenceerror", "typeerror", "syntaxerror", "uncaught", "function", "=>", "promise", "async ", "await ", "document."],
+        "java": ["java", "javac", "exception", "nullpointerexception", "classcastexception", "jvm", "runtime", "class ", "public ", "private ", "static ", "void ", "interface ", "abstract ", "extends ", "implements "],
+        "html": ["html", "<html", "</html>", "<div", "</div>", "<body", "</body>", "<head", "</head>", "<!doctype", "markup", "tag", "element"],
+        "css": ["css", "stylesheet", "css file", "selector", "@media", "@keyframes", "color:", "background:", "margin:", "padding:", "width:", "height:", "px;", "em;", "rem;", "%;" ],
+        "ruby": ["ruby", "rb", "gem", "bundler", "nameerror", "nomethoderror", "argumenterror", "runtimeerror", "loaderror", "typeerror", "zerodivisionerror", "syntaxerror", "notenoughargumentserror", "module", "def ", "end", "nil"]
+    }
+    
+    # Check for language-specific keywords in the error message
+    error_lower = error_message.lower()
+    for language, keywords in language_keywords.items():
+        for keyword in keywords:
+            if keyword in error_lower:
+                language_scores[language] += 1
+    
+    # Pattern matching - check if any pattern from a language matches
+    for language, patterns in ERROR_PATTERNS.items():
+        if language == "general":
+            continue  # Skip general patterns for now
+            
+        for pattern in patterns:
+            if re.search(pattern["regex"], error_message, re.IGNORECASE):
+                language_scores[language] += 2  # Pattern matches are stronger indicators
+    
+    # Check for file extensions in the error message
+    file_extensions = {
+        ".py": "python",
+        ".js": "javascript",
+        ".java": "java",
+        ".html": "html",
+        ".htm": "html",
+        ".css": "css"
+    }
+    
+    for ext, lang in file_extensions.items():
+        if ext in error_message:
+            language_scores[lang] += 3  # File extensions are very strong indicators
+    
+    # Determine the language with highest score
+    max_score = 0
+    detected_language = "general"
+    
+    for language, score in language_scores.items():
+        if score > max_score:
+            max_score = score
+            detected_language = language
+    
+    # If no strong match is found, default to general
+    if max_score <= 1:
+        detected_language = "general"
+        
+    print(f"Language detection scores: {language_scores}, detected: {detected_language}")
+    
+    return detected_language
 
 
 def translate_error(error_message, language="auto", output_language=None):
@@ -176,6 +217,7 @@ def get_general_response(error_message, language, output_language=None):
         "html": "HTML Error",
         "css": "CSS Error",
         "java": "Java Error",
+        "ruby": "Ruby Error",
         "general": "Code Error",
     }
 

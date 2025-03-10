@@ -467,85 +467,102 @@ async function translateError() {
  * Display the translation result
  */
 function displayTranslation(result) {
-    console.log('displayTranslation called with result:', result);
-
-    // Hide placeholder, show content
+    console.log("Displaying translation:", result);
+    
+    // Hide the result placeholder and show the translation content
     resultPlaceholder.style.display = 'none';
     translationContent.style.display = 'block';
     
-    // Display the error title and add language badge
-    const errorTitle = document.getElementById('error-title');
-    errorTitle.textContent = result.title || 'Unknown Error';
+    // Update the translation title and error details
+    document.getElementById('error-title').textContent = result.title || 'Error Translation';
     
-    // Set the language badge
+    // Update language badge
     const languageBadge = document.getElementById('language-badge');
-    languageBadge.textContent = capitalizeFirstLetter(result.language || 'general');
-    languageBadge.setAttribute('data-language', result.language || 'general');
+    if (languageBadge) {
+        languageBadge.textContent = capitalizeFirstLetter(result.language || 'unknown');
+        languageBadge.className = `language-badge ${result.language}`;
+    }
     
-    // Set the difficulty badge
+    // Update difficulty badge if available
     const difficultyBadge = document.getElementById('difficulty-badge');
-    const difficulty = result.difficulty || 'intermediate';
-    difficultyBadge.textContent = capitalizeFirstLetter(difficulty);
-    difficultyBadge.setAttribute('data-difficulty', difficulty);
-    
-    // Clear existing badges except language and difficulty
-    const badgesContainer = document.querySelector('.badges-container');
-    Array.from(badgesContainer.children).forEach(child => {
-        if (child !== languageBadge && child !== difficultyBadge) {
-            child.remove();
+    if (difficultyBadge) {
+        if (result.difficulty) {
+            difficultyBadge.textContent = capitalizeFirstLetter(result.difficulty);
+            difficultyBadge.className = `difficulty-badge ${result.difficulty}`;
+            difficultyBadge.style.display = 'inline-flex';
+        } else {
+            difficultyBadge.style.display = 'none';
         }
-    });
+    }
     
-    // Set original error
-    const originalError = document.getElementById('original-error');
-    originalError.textContent = result.original_error || result.original || '';
+    // Update the original error
+    const originalErrorPre = document.getElementById('original-error');
+    originalErrorPre.textContent = result.original_error || '';
     
-    // Set explanation
-    const explanationText = document.getElementById('explanation-text');
-    explanationText.innerHTML = result.explanation || 'No explanation available.';
+    // Update explanation
+    document.getElementById('explanation-text').textContent = result.explanation || 'No explanation available.';
     
-    // Set solution
-    const solutionText = document.getElementById('solution-text');
-    solutionText.innerHTML = result.solution || 'No solution available.';
+    // Update solution
+    document.getElementById('solution-text').textContent = result.solution || 'No solution available.';
     
-    // Set code example if available
+    // Add to recent searches
+    addToRecentSearches(result);
+    
+    // Handle code example if present
     const codeExampleContainer = document.getElementById('code-example-container');
-    const codeExample = document.getElementById('code-example');
+    const codeExampleElement = document.getElementById('code-example');
     
-    if (result.code_example) {
-        codeExampleContainer.style.display = 'block';
-        codeExample.textContent = result.code_example;
+    if (result.code_example && codeExampleElement) {
+        codeExampleElement.textContent = result.code_example;
+        
+        // Set the language class for syntax highlighting
+        const languageClass = getPrismLanguageClass(result.language);
+        codeExampleElement.className = `language-${languageClass}`;
         
         // Apply syntax highlighting
-        const languageClass = getPrismLanguageClass(result.language);
-        codeExample.className = `language-${languageClass}`;
-        Prism.highlightElement(codeExample);
+        if (window.Prism) {
+            Prism.highlightElement(codeExampleElement);
+        }
+        
+        codeExampleContainer.style.display = 'block';
     } else {
         codeExampleContainer.style.display = 'none';
     }
     
-    // Set related errors if available
+    // Handle related errors if present
     const relatedErrorsContainer = document.getElementById('related-errors-container');
     const relatedErrorsList = document.getElementById('related-errors-list');
     
-    if (result.related_errors && result.related_errors.length > 0) {
-        relatedErrorsContainer.style.display = 'block';
+    if (result.related_errors && result.related_errors.length > 0 && relatedErrorsList) {
+        // Clear existing items
         relatedErrorsList.innerHTML = '';
         
+        // Add new related errors
         result.related_errors.forEach(error => {
             const li = document.createElement('li');
-            li.textContent = error.title || error.id || error;
+            li.textContent = error;
             relatedErrorsList.appendChild(li);
         });
+        
+        relatedErrorsContainer.style.display = 'block';
     } else {
         relatedErrorsContainer.style.display = 'none';
     }
     
-    // Add this translation to recent searches
-    addToRecentSearches(result);
+    // Create share button if it doesn't exist
+    createShareButton();
     
     // Scroll to the translation section
     translationContent.scrollIntoView({ behavior: 'smooth' });
+    
+    // Focus on the translation result for accessibility
+    focusElement(document.getElementById('error-title'));
+    
+    // Announce the translation to screen readers
+    const announcer = document.getElementById('a11y-announcer');
+    if (announcer) {
+        announcer.textContent = `Translation complete: ${result.title}`;
+    }
 }
 
 /**
@@ -565,6 +582,8 @@ function getPrismLanguageClass(language) {
             return 'css';
         case 'java':
             return 'java';
+        case 'ruby':
+            return 'ruby';
         default:
             return 'none';
     }
@@ -900,3 +919,52 @@ function clearRecentSearches() {
     loadRecentSearches();
     console.log('Recent searches cleared');
 }
+
+/**
+ * Improve accessibility by managing focus and keyboard navigation
+ * @param {HTMLElement} element - The element to focus
+ */
+function focusElement(element) {
+    if (!element) return;
+    
+    // Set focus to the element
+    element.focus();
+    
+    // Ensure it has proper tabindex if it's not naturally focusable
+    if (!['a', 'button', 'input', 'select', 'textarea'].includes(element.tagName.toLowerCase())) {
+        if (!element.hasAttribute('tabindex')) {
+            element.setAttribute('tabindex', '-1');
+        }
+    }
+    
+    // Announce to screen readers via aria-live region
+    const announcer = document.getElementById('a11y-announcer');
+    if (announcer) {
+        announcer.textContent = `Focused on ${element.getAttribute('aria-label') || element.textContent || 'element'}`;
+    }
+    
+    console.log('Focused element:', element);
+}
+
+// Add keyboard shortcuts for common actions
+document.addEventListener('keydown', function(event) {
+    // Alt+T for translate (Windows/Linux) or Option+T (Mac)
+    if ((event.altKey || event.metaKey) && event.key === 't') {
+        event.preventDefault();
+        translateError();
+    }
+    
+    // Alt+C for clear (Windows/Linux) or Option+C (Mac)
+    if ((event.altKey || event.metaKey) && event.key === 'c') {
+        event.preventDefault();
+        clearInput();
+    }
+    
+    // Escape key closes any modal or overlay
+    if (event.key === 'Escape') {
+        const loadingOverlay = document.getElementById('loading-overlay');
+        if (loadingOverlay && loadingOverlay.style.display === 'flex') {
+            showLoading(false);
+        }
+    }
+});

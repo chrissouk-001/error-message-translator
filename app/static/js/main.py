@@ -21,6 +21,7 @@ def getPrismLanguageClass(language):
         "html": "language-markup",
         "css": "language-css",
         "java": "language-java",
+        "ruby": "language-ruby",
     }
     return language_map.get(language, "language-none")
 

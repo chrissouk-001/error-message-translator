@@ -1163,12 +1163,218 @@ if (myObject instanceof TargetClass) {
     }
 ]
 
-# Update ERROR_PATTERNS dictionary to include Java
+# Ruby error patterns
+RUBY_PATTERNS = [
+    {
+        "regex": r"NameError: uninitialized constant (.*)",
+        "title": "Ruby Uninitialized Constant Error",
+        "explanation": "This error occurs when Ruby tries to use a constant ({{$1}}) that hasn't been defined yet. Constants in Ruby are typically class or module names that start with a capital letter.",
+        "solution": "Make sure the class or module is properly defined and the name is spelled correctly. Check that you've required the necessary files that define this constant.",
+        "difficulty": "beginner",
+        "code_example": """
+# Example fix for uninitialized constant error
+require 'my_module'  # Add the missing require statement
+
+# Or define the missing constant
+module MyModule
+  class MyClass
+    # Class implementation
+  end
+end
+"""
+    },
+    {
+        "regex": r"NoMethodError: undefined method `(.*)' for (.*)",
+        "title": "Ruby Undefined Method Error",
+        "explanation": "This error occurs when you try to call a method ({{$1}}) on an object ({{$2}}) that doesn't have that method defined.",
+        "solution": "Check that you're calling the right method on the right object. Make sure the object is of the expected type. You may need to define the method or use a different method.",
+        "difficulty": "beginner",
+        "code_example": """
+# Example fix for undefined method error
+# Instead of:
+# some_variable.undefined_method
+
+# Make sure the variable is the right type
+puts some_variable.class  # Check what kind of object it is
+
+# Then use a method that exists for that type
+some_variable.to_s  # For example, convert to string
+"""
+    },
+    {
+        "regex": r"ArgumentError: wrong number of arguments \(given (\d+), expected (\d+)\)",
+        "title": "Ruby Wrong Number of Arguments Error",
+        "explanation": "This error occurs when you call a method with {{$1}} arguments, but it expects {{$2}} arguments.",
+        "solution": "Check the method's documentation to see how many arguments it expects. Adjust your code to provide the correct number of arguments.",
+        "difficulty": "beginner",
+        "code_example": """
+# Example fix for wrong number of arguments
+# Instead of:
+# my_method(arg1, arg2, arg3)  # Too many arguments
+
+# Check the method definition
+def my_method(arg1, arg2)
+  # Method only expects 2 arguments
+end
+
+# Correct the call
+my_method(arg1, arg2)  # Correct number of arguments
+"""
+    },
+    {
+        "regex": r"SyntaxError: (.*)",
+        "title": "Ruby Syntax Error",
+        "explanation": "This error occurs when Ruby can't understand your code because it doesn't follow the rules of Ruby syntax. Specifically: {{$1}}",
+        "solution": "Check the indicated line for syntax errors like missing end keywords, mismatched brackets, or incorrect punctuation.",
+        "difficulty": "beginner",
+        "code_example": """
+# Common syntax errors in Ruby:
+
+# Missing 'end' keyword
+def my_method
+  if condition
+    # code
+  end
+end  # Add missing 'end'
+
+# Mismatched brackets
+hash = { key: 'value' }  # Correct bracket matching
+
+# Missing commas in arrays or hashes
+array = [1, 2, 3]  # Commas between elements
+"""
+    },
+    {
+        "regex": r"undefined local variable or method `(.*)' for (.*)",
+        "title": "Ruby Undefined Variable Error",
+        "explanation": "This error occurs when you try to use a variable or method ({{$1}}) that hasn't been defined in the current scope.",
+        "solution": "Make sure you've defined the variable before using it. Check for typos in the variable name. If it's a method, ensure it's defined in the class or module you're using.",
+        "difficulty": "beginner",
+        "code_example": """
+# Define variables before using them
+my_variable = "Hello"  # Define the variable
+puts my_variable      # Then use it
+
+# For class variables, make sure they're defined
+class MyClass
+  def initialize
+    @instance_var = "value"  # Define instance variable
+  end
+  
+  def my_method
+    puts @instance_var  # Now it's defined in this scope
+  end
+end
+"""
+    },
+    {
+        "regex": r"LoadError: cannot load such file -- (.*)",
+        "title": "Ruby Load Error",
+        "explanation": "This error occurs when Ruby can't find the file or library ({{$1}}) that you're trying to require or load.",
+        "solution": "Check that the gem or file you're trying to load is installed and the path is correct. You may need to install the gem with 'gem install' or adjust your load path.",
+        "difficulty": "intermediate",
+        "code_example": """
+# Fix for LoadError
+# Install missing gems
+# $ gem install missing_gem
+
+# Or fix the require statement
+require 'correct_name'
+
+# Or specify the full path
+require_relative '../path/to/my_file'
+"""
+    },
+    {
+        "regex": r"TypeError: (.*)",
+        "title": "Ruby Type Error",
+        "explanation": "This error occurs when you try to perform an operation on an object that doesn't support that operation. Specifically: {{$1}}",
+        "solution": "Check the types of objects you're working with. You may need to convert objects to the correct type before performing operations on them.",
+        "difficulty": "intermediate",
+        "code_example": """
+# Fix for TypeError
+# Convert objects to appropriate types before operations
+number = "10".to_i     # Convert string to integer
+string = 10.to_s       # Convert integer to string
+array = [1, 2, 3]
+hash = { a: 1, b: 2 }
+
+# Check object type before operations
+if object.is_a?(String)
+  # String operations
+elsif object.is_a?(Array)
+  # Array operations
+end
+"""
+    },
+    {
+        "regex": r"ZeroDivisionError: divided by 0",
+        "title": "Ruby Division by Zero Error",
+        "explanation": "This error occurs when you try to divide a number by zero, which is mathematically undefined.",
+        "solution": "Add a check to prevent division by zero. Make sure divisors are never zero before performing division operations.",
+        "difficulty": "beginner",
+        "code_example": """
+# Safe division with zero check
+def safe_divide(a, b)
+  if b.zero?
+    puts "Cannot divide by zero!"
+    return nil
+  else
+    return a / b
+  end
+end
+
+# Or with a ternary operator
+result = divisor.zero? ? nil : number / divisor
+"""
+    },
+    {
+        "regex": r"Errno::ENOENT: No such file or directory - (.*)",
+        "title": "Ruby File Not Found Error",
+        "explanation": "This error occurs when Ruby tries to access a file ({{$1}}) that doesn't exist at the specified path.",
+        "solution": "Check that the file exists at the specified path. Make sure you're using the correct file name and path. You may need to create the file if it doesn't exist.",
+        "difficulty": "beginner",
+        "code_example": """
+# Check if file exists before opening
+file_path = "path/to/file.txt"
+
+if File.exist?(file_path)
+  File.open(file_path, "r") do |file|
+    # File operations
+  end
+else
+  puts "File doesn't exist!"
+  # Create the file or handle the error
+end
+"""
+    },
+    {
+        "regex": r"RuntimeError: (.*)",
+        "title": "Ruby Runtime Error",
+        "explanation": "This is a generic error that occurs while your program is running. Specifically: {{$1}}",
+        "solution": "The solution depends on the specific error message. Check the error details and look at where the error occurred in your code. You may need to add error handling with begin/rescue blocks.",
+        "difficulty": "intermediate",
+        "code_example": """
+# Use begin/rescue for error handling
+begin
+  # Code that might raise an error
+  result = risky_operation()
+rescue => e
+  # Handle the error
+  puts "Error occurred: #{e.message}"
+  # Provide fallback or recovery code
+end
+"""
+    }
+]
+
+# Update ERROR_PATTERNS dictionary to include Ruby
 ERROR_PATTERNS = {
     "python": PYTHON_PATTERNS,
     "javascript": JAVASCRIPT_PATTERNS,
     "html": HTML_PATTERNS,
     "css": CSS_PATTERNS,
-    "java": JAVA_PATTERNS,  # Add Java patterns
+    "java": JAVA_PATTERNS,
+    "ruby": RUBY_PATTERNS,
     "general": GENERAL_PATTERNS,
 }

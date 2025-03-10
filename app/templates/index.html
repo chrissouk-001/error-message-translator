@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Error Message Translator</title>
-    <meta name="description" content="Translate confusing programming error messages into simple, understandable explanations. Perfect for beginners learning Python, JavaScript, Java, HTML, and CSS.">
+    <meta name="description" content="Translate confusing programming error messages into simple, understandable explanations. Perfect for beginners learning Python, JavaScript, Java, Ruby, HTML, and CSS.">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,6 +23,12 @@
     </script>
 </head>
 <body>
+    <!-- Accessibility announcer for screen readers -->
+    <div id="a11y-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+    
+    <!-- Skip to content link for keyboard users -->
+    <a href="#main-content" class="skip-to-content">Skip to content</a>
+    
     <!-- Port notification -->
     <div id="port-notification" class="port-notification">
         This app is running on port 5001. If you're having connection issues, please ensure you're accessing <a href="http://localhost:5001/">http://localhost:5001/</a>
@@ -44,7 +50,7 @@
         <div class="container">
             <div class="logo"><i class="fas fa-language"></i></div>
             <h1 class="fade-in">Error Message Translator</h1>
-            <p class="tagline fade-in">Demystify code errors across Python, JavaScript, Java, HTML, and CSS in seconds</p>
+            <p class="tagline fade-in">Demystify code errors across Python, JavaScript, Java, Ruby, HTML, and CSS in seconds</p>
             <div class="header-buttons fade-in">
                 <a href="https://github.com/chrissouk-001/error-message-translator" target="_blank" class="secondary-btn">
                     <i class="fab fa-github"></i> View on GitHub
@@ -56,7 +62,7 @@
         </div>
     </header>
 
-    <main class="container">
+    <main class="container" id="main-content">
         <section class="input-section card">
             <h2>Paste your error message</h2>
             <div class="language-options">
@@ -66,9 +72,10 @@
                         <option value="auto">Auto-detect Language</option>
                         <option value="python">Python</option>
                         <option value="javascript">JavaScript</option>
+                        <option value="java">Java</option>
+                        <option value="ruby">Ruby</option>
                         <option value="html">HTML</option>
                         <option value="css">CSS</option>
-                        <option value="java">Java</option>
                     </select>
                 </div>
                 <div class="language-selector output-language-selector">
@@ -188,6 +195,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-ruby.min.js"></script>
     
     <!-- Main Application Script -->
     <script src="{{ url_for('static', filename='js/main.js') }}?v=1.2.{{range(1, 10000) | random}}"></script>
