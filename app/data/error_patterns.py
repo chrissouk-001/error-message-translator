@@ -56,37 +56,33 @@ for digit in str(number):  # Convert to string first
     },
     {
         "regex": r"SyntaxError: invalid syntax",
-        "title": "Invalid Syntax",
-        "explanation": "Python can't understand your code because there's a syntax error. This could be due to missing parentheses, quotes, colons, or other syntax elements.",
-        "solution": "Check your code for syntax errors like missing parentheses, brackets, quotes, or colons. Look for misplaced operators or keywords.",
+        "title": "Syntax Error: Invalid Syntax",
+        "explanation": "Python encountered invalid syntax. This might be due to a missing punctuation or an extra character.",
+        "solution": "Check your code for any syntax mistakes such as missing colons, parentheses, or quotation marks.",
         "code_example": """
-# Examples of invalid syntax:
-if x = 5:  # Error: using = instead of ==
-    print(x)
-    
+# Incorrect:
+print("Hello World"
+
 # Correct:
-if x == 5:
-    print(x)
+print("Hello World")
 """,
-        "difficulty": "beginner",
+        "difficulty": "beginner"
     },
     {
-        "regex": r"IndentationError: ([^\']+)",
+        "regex": r"IndentationError: (unexpected indent|expected an indented block)",
         "title": "Indentation Error",
-        "explanation": "Python uses indentation to define code blocks. Your code has inconsistent indentation, which confuses the Python interpreter.",
-        "solution": "Fix the indentation in your code. Use either spaces or tabs consistently (spaces are recommended). Each level of indentation should be the same number of spaces (usually 4).",
+        "explanation": "There is an indentation issue in your code. Python relies on indentation to define code blocks.",
+        "solution": "Ensure that your code follows proper indentation. Each code block should be consistently indented.",
         "code_example": """
-# Incorrect indentation:
-def function():
-    x = 1
-  y = 2  # Error: inconsistent indentation
-    
-# Correct indentation:
-def function():
-    x = 1
-    y = 2
+# Incorrect:
+def foo():
+print("Hello World")
+
+# Correct:
+def foo():
+    print("Hello World")
 """,
-        "difficulty": "beginner",
+        "difficulty": "beginner"
     },
     {
         "regex": r"ImportError: No module named ([^\']+)",
@@ -327,6 +323,22 @@ if "email" in my_dict:
 else:
     value = "Not provided"
 """,
+    },
+    {
+        "regex": r"AttributeError: '([^']+)' object has no attribute '([^']+)'",
+        "title": "Attribute Error",
+        "explanation": "Python attempted to access an attribute on an object that does not exist. This is often due to a typo or using an unsupported method.",
+        "solution": "Check if the attribute exists on the object and correct any typos. Consider using hasattr() to verify attribute existence.",
+        "code_example": """
+# Incorrect:
+obj = None
+obj.some_method()
+
+# Correct:
+if obj is not None:
+    obj.some_method()
+""",
+        "difficulty": "beginner"
     },
 ]
 
@@ -581,6 +593,21 @@ console.log(someVar);  // Works!
 """,
         "difficulty": "beginner",
     },
+    {
+        "regex": r"TypeError: (.*) is not a function",
+        "title": "TypeError: Not a Function",
+        "explanation": "Your code is attempting to call something that is not a function. This might happen if you mistype the function name or if a variable expected to be a function is not.",
+        "solution": "Ensure that the variable is actually a function. Check for typos and confirm its definition.",
+        "code_example": """
+// Incorrect:
+var result = myVar();
+ 
+// Correct:
+function myVar() { return 42; }
+var result = myVar();
+""",
+        "difficulty": "beginner"
+    },
 ]
 
 # HTML error patterns
@@ -729,6 +756,24 @@ HTML_PATTERNS = [
   <li>Item 2</li>
 </ul>
 """,
+    },
+    {
+        "regex": r"Error: Element ([^ ]+) not allowed as child of element ([^ ]+)",
+        "title": "HTML Tag Nesting Error",
+        "explanation": "The element {{$1}} is not allowed as a child of {{$2}}. This means your HTML structure is incorrect and elements are nested improperly.",
+        "solution": "Revisit the HTML specification for allowed element nesting or restructure your HTML so that the element {{$1}} is placed appropriately.",
+        "code_example": """
+<!-- Incorrect -->
+<ul>
+  <p>List item</p>
+</ul>
+
+<!-- Correct -->
+<ul>
+  <li><p>List item</p></li>
+</ul>
+""",
+        "difficulty": "beginner"
     },
 ]
 
@@ -917,6 +962,20 @@ CSS_PATTERNS = [
   padding: 10px;
 }
 """,
+    },
+    {
+        "regex": r"Error: unclosed comment",
+        "title": "Unclosed CSS Comment",
+        "explanation": "A CSS comment was not properly closed with '*/'. This can cause the stylesheet to fail to compile.",
+        "solution": "Ensure that all CSS comments are properly closed. Each comment should start with /* and end with */.",
+        "code_example": """
+/* Incorrect:
+body { color: red;  /* missing closing comment
+
+Correct:
+body { color: red; }  /* properly closed comment */
+""",
+        "difficulty": "beginner"
     },
 ]
 
