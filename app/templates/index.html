@@ -93,7 +93,7 @@
                 </div>
                 
                 <div class="button-group">
-                    <button id="translate-btn" class="primary-btn">
+                    <button id="translate-btn" class="primary-btn" onclick="try { translateError(); } catch(e) { console.error('Main translate function failed:', e); translateErrorFallback(); } return false;">
                         <i class="fas fa-wand-magic-sparkles"></i> Translate
                     </button>
                     <button id="clear-btn" aria-label="Clear input">
@@ -138,12 +138,12 @@
                     
                     <div class="explanation">
                         <h3><i class="fas fa-lightbulb"></i> What It Means</h3>
-                        <p id="explanation"></p>
+                        <p id="explanation-text"></p>
                     </div>
                     
                     <div class="solution">
                         <h3><i class="fas fa-wrench"></i> How To Fix It</h3>
-                        <p id="solution"></p>
+                        <p id="solution-text"></p>
                     </div>
                     
                     <div id="code-example-section" class="code-example hidden">
@@ -180,7 +180,7 @@
 
     <footer>
         <div class="container">
-            <p>Error Message Translator &copy; 2024 | <a href="https://github.com/chrissouk-001/error-message-translator" target="_blank">GitHub <i class="fab fa-github"></i></a></p>
+            <p>Error Message Translator &copy; 2025 | <a href="https://github.com/chrissouk-001/error-message-translator" target="_blank">GitHub <i class="fab fa-github"></i></a></p>
             <p class="disclaimer">This is a research project to evaluate AI-assisted coding.</p>
         </div>
     </footer>
@@ -235,6 +235,90 @@
     </div>
 
     <!-- Scripts -->
+    <script>
+        // Global error handler to detect JavaScript issues
+        window.onerror = function(message, source, lineno, colno, error) {
+            console.error('Global error caught:', {
+                message: message,
+                source: source,
+                lineno: lineno,
+                colno: colno,
+                error: error
+            });
+            alert('An error occurred in the application. Check the developer console for details.');
+            return false;
+        };
+        
+        // Fallback translateError function in case the main one fails
+        window.translateErrorFallback = function() {
+            console.log('Using fallback translation function');
+            const errorMessage = document.getElementById('error-message').value.trim();
+            if (!errorMessage) {
+                alert('Please enter an error message to translate.');
+                return false;
+            }
+            
+            // Show the loading overlay
+            const loadingOverlay = document.getElementById('loading-overlay');
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'flex';
+            }
+            
+            // Get selected language
+            const languageInput = document.getElementById('language-input');
+            const language = languageInput ? languageInput.value : 'auto';
+            
+            // Make the API request
+            fetch('/api/translate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    error_message: errorMessage,
+                    language: language,
+                    output_language: 'en'
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(result => {
+                console.log('Translation result:', result);
+                
+                // Hide placeholder, show result
+                document.getElementById('result-placeholder').style.display = 'none';
+                const translationResult = document.getElementById('translation-result');
+                translationResult.style.display = 'block';
+                translationResult.classList.remove('hidden');
+                
+                // Set the error title
+                document.getElementById('error-title').textContent = result.title || 'Error';
+                
+                // Set the original error
+                document.getElementById('original-error').textContent = result.original_error || '';
+                
+                // Set the explanation
+                document.getElementById('explanation-text').textContent = result.explanation || '';
+                
+                // Set the solution
+                document.getElementById('solution-text').textContent = result.solution || '';
+            })
+            .catch(error => {
+                console.error('Translation failed:', error);
+                alert('Failed to translate: ' + error.message);
+            })
+            .finally(() => {
+                // Hide loading overlay
+                if (loadingOverlay) {
+                    loadingOverlay.style.display = 'none';
+                }
+            });
+            
+            return false;
+        };
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>

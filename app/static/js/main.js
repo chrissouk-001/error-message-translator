@@ -6,12 +6,12 @@
  */
 
 // DOM Elements
-const errorInput = document.getElementById('error-input');
-const languageSelect = document.getElementById('language-select');
+const errorInput = document.getElementById('error-message');
+const languageSelect = document.getElementById('language-input');
 const translateBtn = document.getElementById('translate-btn');
 const clearBtn = document.getElementById('clear-btn');
 const resultPlaceholder = document.getElementById('result-placeholder');
-const translationContent = document.getElementById('translation-content');
+const translationContent = document.getElementById('translation-result');
 const outputLanguageSelect = document.getElementById('output-language-select');
 const recentSearchesContainer = document.getElementById('searches-container');
 const helpBtn = document.getElementById('help-btn');
@@ -438,6 +438,14 @@ async function fetchLanguages() {
 async function translateError() {
     console.log('translateError function called');
     
+    // Debug element existence
+    console.log('Debug - Elements check:', {
+        errorInput: !!errorInput,
+        errorInputValue: errorInput ? errorInput.value : 'undefined',
+        translateBtn: !!translateBtn,
+        loadingOverlay: !!document.getElementById('loading-overlay'),
+    });
+    
     const errorMessage = errorInput.value.trim();
     if (!errorMessage) {
         showError('Please enter an error message to translate.');
@@ -463,6 +471,7 @@ async function translateError() {
         console.log('API URL:', apiUrl);
         
         // Make the API request
+        console.log('Making API request...');
         const response = await fetch(apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -473,6 +482,8 @@ async function translateError() {
             })
         });
         
+        console.log('API response received, status:', response.status);
+        
         if (!response.ok) {
             const errorText = await response.text();
             console.error('API error response:', errorText);
@@ -480,6 +491,7 @@ async function translateError() {
         }
         
         // Parse the response
+        console.log('Parsing response as JSON...');
         const result = await response.json();
         console.log('Translation result:', result);
         
@@ -628,7 +640,12 @@ function getPrismLanguageClass(language) {
  * @param {boolean} show - Whether to show the loading overlay
  */
 function showLoading(show) {
-    loadingOverlay.style.display = show ? 'flex' : 'none';
+    const loadingOverlay = document.getElementById('loading-overlay');
+    if (loadingOverlay) {
+        loadingOverlay.style.display = show ? 'flex' : 'none';
+    } else {
+        console.error('Loading overlay element not found!');
+    }
 }
 
 /**
@@ -922,31 +939,95 @@ function isElementInViewport(element) {
     );
 }
 
+/**
+ * Diagnose potential issues with the application
+ */
+function diagnoseAppIssues() {
+    console.log('Running app diagnostics...');
+    
+    // Check essential DOM elements
+    const elements = {
+        'error-message': document.getElementById('error-message'),
+        'language-input': document.getElementById('language-input'),
+        'translate-btn': document.getElementById('translate-btn'),
+        'translation-result': document.getElementById('translation-result'),
+        'result-placeholder': document.getElementById('result-placeholder'),
+        'loading-overlay': document.getElementById('loading-overlay'),
+        'help-btn': document.getElementById('help-btn'),
+        'help-modal': document.getElementById('help-modal'),
+        'theme-toggle': document.getElementById('theme-toggle')
+    };
+    
+    let hasIssues = false;
+    
+    // Log status of all elements
+    for (const [id, element] of Object.entries(elements)) {
+        if (!element) {
+            console.error(`MISSING ELEMENT: ${id} not found in the DOM`);
+            hasIssues = true;
+        } else {
+            console.log(`✓ Found element: ${id}`);
+        }
+    }
+    
+    // Fix the translate button if it exists
+    if (elements['translate-btn']) {
+        // Force add both event listeners and attributes
+        elements['translate-btn'].addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Translate button clicked via event listener');
+            translateError();
+        });
+        
+        elements['translate-btn'].onclick = function(e) {
+            e.preventDefault();
+            console.log('Translate button clicked via onclick property');
+            translateError();
+            return false;
+        };
+        
+        console.log('Fixed translate button event handlers');
+    }
+    
+    if (hasIssues) {
+        console.warn('Application has some missing elements. Some features may not work properly.');
+    } else {
+        console.log('All essential elements found. App should function correctly.');
+    }
+    
+    // Return elements object for further use
+    return elements;
+}
+
 // Initialize the application when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM fully loaded and parsed');
-    console.log('All DOM elements:', {
-        errorInput: !!document.getElementById('error-input'),
-        languageSelect: !!document.getElementById('language-select'),
-        outputLanguageSelect: !!document.getElementById('output-language-select'),
-        translateBtn: !!document.getElementById('translate-btn'),
-        helpBtn: !!document.getElementById('help-btn'),
-        modal: !!document.getElementById('help-modal'),
-        themeToggle: !!document.getElementById('theme-toggle')
-    });
     
     // Initialize the application
     initApp();
     
-    // Double-check button connections
+    // Run diagnostics
+    const elements = diagnoseAppIssues();
+    
+    // Double-check translate button specifically
     const translateBtn = document.getElementById('translate-btn');
     if (translateBtn) {
-        console.log('Found translate button, adding event listener');
+        console.log('Found translate button, ensuring event listeners are attached');
         translateBtn.addEventListener('click', translateError);
+        
+        // Add a backup direct onclick handler
+        translateBtn.setAttribute('onclick', 'translateError(); return false;');
+        
+        // Ensure the button is visible and clickable
+        translateBtn.style.pointerEvents = 'auto';
+        translateBtn.style.cursor = 'pointer';
+        translateBtn.disabled = false;
+        
+        console.log('Translate button ready for use');
     } else {
         console.error('Translate button not found!');
     }
-    
+
     // Explicitly add event listeners for the help button and theme toggle again
     // This ensures they work even if there were issues during initApp()
     const helpBtn = document.getElementById('help-btn');

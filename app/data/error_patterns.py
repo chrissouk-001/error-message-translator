@@ -117,32 +117,30 @@ result = text[::-1]  # Use slicing to reverse a string: "olleH"
     },
     {
         "regex": r"ZeroDivisionError: division by zero",
-        "title": "Division by Zero",
-        "explanation": "Your code is trying to divide a number by zero, which is not allowed in mathematics.",
-        "solution": "Check for places where you might be dividing by zero and add conditions to handle those cases.",
+        "title": "Division by Zero Error",
+        "explanation": "You're trying to divide a number by zero, which is not allowed in mathematics or programming. This often happens when a variable used as a divisor has a value of zero.",
+        "solution": "Check your divisor variables and ensure they can never be zero. Add a condition to handle cases where division might attempt to use zero as a divisor.",
         "code_example": """
 # Incorrect:
-x = 10
-y = 0
-result = x / y  # Error: division by zero
+result = 10 / 0  # Error: ZeroDivisionError
 
-# Correct (using a conditional):
-x = 10
-y = 0
-if y != 0:
-    result = x / y
+# Correct:
+divisor = 0
+if divisor != 0:
+    result = 10 / divisor
 else:
     result = "Cannot divide by zero"
 """,
+        "related_errors": ["ZeroDivisionError: integer division or modulo by zero"],
         "difficulty": "beginner",
     },
     {
         "regex": r"RecursionError: maximum recursion depth exceeded",
         "title": "Maximum Recursion Depth Exceeded",
-        "explanation": "Your code contains a function that is calling itself too many times. This usually happens when a recursive function doesn't have a proper exit condition, creating an infinite loop of function calls.",
-        "solution": "Check your recursive function and make sure it has a proper base case that will eventually be reached. Also consider if the problem could be solved using iteration instead of recursion.",
+        "explanation": "Your function is calling itself too many times, creating a recursive chain that's deeper than Python allows. This usually happens when a recursive function doesn't have a proper base case to stop the recursion.",
+        "solution": "Ensure your recursive function has a proper base case that will be reached. Consider rewriting your function to use iteration instead of recursion for large inputs.",
         "code_example": """
-# Incorrect (infinite recursion):
+# Incorrect (will cause RecursionError):
 def factorial(n):
     return n * factorial(n-1)  # No base case!
 
@@ -151,8 +149,15 @@ def factorial(n):
     if n <= 1:  # Base case
         return 1
     return n * factorial(n-1)
+
+# Alternative (iteration instead of recursion):
+def factorial_iter(n):
+    result = 1
+    for i in range(1, n+1):
+        result *= i
+    return result
 """,
-        "related_errors": ["StackOverflowError"],
+        "related_errors": ["RuntimeError: maximum recursion depth exceeded while calling a Python object"],
         "difficulty": "intermediate",
     },
     {
@@ -233,23 +238,33 @@ else:
     },
     {
         "regex": r"FileNotFoundError: \[Errno 2\] No such file or directory: \'?([^\']+)\'?",
-        "title": "File Not Found: {{$1}}",
-        "explanation": "Python cannot find the file \"{{$1}}\" that you're trying to access. Either the file doesn't exist, or the path is incorrect.",
-        "solution": "Check that the file exists at the specified path. Make sure you're using the correct path, which might be relative to the working directory.",
+        "title": "File Not Found: '{{$1}}'",
+        "explanation": "Python couldn't find the file '{{$1}}' that you're trying to open or access. This could be because the file doesn't exist or you've specified the wrong path.",
+        "solution": "Check that the file exists at the specified location. Verify the path is correct, including any relative path components. If creating a new file, make sure the directory exists.",
         "code_example": """
-# Incorrect (if file doesn't exist):
-with open("{{$1}}", "r") as file:
-    content = file.read()
+# Problem:
+with open('{{$1}}', 'r') as file:
+    content = file.read()  # Error: file doesn't exist
 
-# Correct (with error handling):
+# Solutions:
 import os
-file_path = "{{$1}}"
-if os.path.exists(file_path):
-    with open(file_path, "r") as file:
+
+# 1. Check if file exists before opening
+if os.path.exists('{{$1}}'):
+    with open('{{$1}}', 'r') as file:
         content = file.read()
 else:
-    print(f"The file {file_path} does not exist.")
+    print("File doesn't exist!")
+
+# 2. Use try-except to handle the error
+try:
+    with open('{{$1}}', 'r') as file:
+        content = file.read()
+except FileNotFoundError:
+    print("File doesn't exist!")
 """,
+        "related_errors": ["IOError", "PermissionError"],
+        "difficulty": "beginner",
     },
     {
         "regex": r"ModuleNotFoundError: No module named \'([^\']+)\'",
@@ -275,114 +290,20 @@ from mypackage import mymodule  # Correct import
 """,
     },
     {
-        "regex": r"ZeroDivisionError: division by zero",
-        "title": "Division by Zero",
-        "explanation": "Your code is attempting to divide a number by zero, which is mathematically undefined and raises a ZeroDivisionError in Python.",
-        "solution": "Add a condition to check if the divisor is zero before performing the division. You can use an if statement to provide an alternative result or raise a more specific error.",
-        "code_example": """
-# Problematic code
-result = 10 / 0  # This will raise ZeroDivisionError
-
-# Safer approach with condition
-divisor = 0
-if divisor != 0:
-    result = 10 / divisor
-else:
-    result = "Cannot divide by zero"  # Or some default value
-
-# Using try-except
-try:
-    result = 10 / divisor
-except ZeroDivisionError:
-    result = "Cannot divide by zero"
-""",
-    },
-    {
-        "regex": r"KeyError: \'([^\']+)\'",
-        "title": "Dictionary Key Not Found: {{$1}}",
-        "explanation": 'Your code is trying to access a dictionary with the key "{{$1}}", but this key doesn\'t exist in the dictionary.',
-        "solution": "Check if the key exists before accessing it using the `in` operator, or use the `.get()` method which allows you to provide a default value if the key doesn't exist.",
-        "code_example": """
-# Problematic code
-my_dict = {"name": "John", "age": 30}
-value = my_dict["email"]  # KeyError: 'email'
-
-# Better approach with .get() method
-my_dict = {"name": "John", "age": 30}
-value = my_dict.get("email", "Not provided")  # Returns "Not provided" instead of raising error
-
-# Or check before accessing
-if "email" in my_dict:
-    value = my_dict["email"]
-else:
-    value = "Not provided"
-""",
-    },
-    {
         "regex": r"AttributeError: '([^']+)' object has no attribute '([^']+)'",
-        "title": "Attribute Error",
-        "explanation": "Python attempted to access an attribute on an object that does not exist. This is often due to a typo or using an unsupported method.",
-        "solution": "Check if the attribute exists on the object and correct any typos. Consider using hasattr() to verify attribute existence.",
+        "title": "Missing Attribute: '{{$1}}' Has No '{{$2}}'",
+        "explanation": "You're trying to access an attribute or method called '{{$2}}' on a {{$1}} object, but that object doesn't have this attribute or method.",
+        "solution": "Check the documentation for the {{$1}} type to see what attributes and methods are available. Make sure you're using the correct object or add the attribute if you're working with your own class.",
         "code_example": """
-# Incorrect:
-obj = None
-obj.some_method()
+# Example:
+x = 5  # an integer
+x.append(10)  # Error: 'int' object has no attribute 'append'
 
 # Correct:
-if obj is not None:
-    obj.some_method()
+x = [5]  # a list, which has the append method
+x.append(10)  # This works!
 """,
-        "difficulty": "beginner"
-    },
-    {
-        "regex": r"RecursionError: maximum recursion depth exceeded",
-        "title": "Maximum Recursion Depth Exceeded",
-        "explanation": "Your code contains a function that is calling itself too many times. This usually happens when a recursive function doesn't have a proper exit condition, creating an infinite loop of function calls.",
-        "solution": "Check your recursive function and make sure it has a proper base case that will eventually be reached. Also consider if the problem could be solved using iteration instead of recursion.",
-        "code_example": """
-# Incorrect (infinite recursion):
-def factorial(n):
-    return n * factorial(n-1)  # No base case!
-
-# Correct:
-def factorial(n):
-    if n <= 1:  # Base case
-        return 1
-    return n * factorial(n-1)
-""",
-        "related_errors": ["StackOverflowError"],
-        "difficulty": "intermediate",
-    },
-    {
-        "regex": r"ModuleNotFoundError: No module named '([^']+)'",
-        "title": "Module Not Found: {{$1}}",
-        "explanation": "Python couldn't find the module '{{$1}}' that your code is trying to import. This could be because the module isn't installed, or there's a typo in the module name.",
-        "solution": "Make sure the module '{{$1}}' is installed. You can install it using pip: 'pip install {{$1}}'. Also check for typos in the import statement.",
-        "code_example": """
-# Installation command:
-# pip install {{$1}}
-
-# Then import it:
-import {{$1}}
-""",
-        "related_errors": ["ImportError"],
-        "difficulty": "beginner",
-    },
-    {
-        "regex": r"KeyboardInterrupt",
-        "title": "Keyboard Interrupt",
-        "explanation": "This isn't actually an error, but a signal that the program was deliberately interrupted by the user (usually by pressing Ctrl+C).",
-        "solution": "If you intended to stop the program, no action is needed. If this was accidental, simply run the program again. If you want your program to handle interruptions gracefully, you can catch KeyboardInterrupt exceptions.",
-        "code_example": """
-try:
-    # Your long-running code here
-    while True:
-        process_data()
-except KeyboardInterrupt:
-    print("Program was interrupted by user")
-    # Clean up resources here
-    save_progress()
-""",
+        "related_errors": ["AttributeError", "HasNoAttributeError"],
         "difficulty": "beginner",
     },
 ]
@@ -501,11 +422,12 @@ console.log(user?.name); // Safely outputs undefined instead of crashing
     },
     {
         "regex": r"Uncaught SyntaxError: Unexpected token '([^']+)'",
-        "title": "Syntax Error: Unexpected Token '{{$1}}'",
+        "title": "Unexpected Token: '{{$1}}'",
         "explanation": "JavaScript encountered a character '{{$1}}' that it didn't expect at that position. This is often due to missing or mismatched brackets, parentheses, or quotes.",
         "solution": "Check for unbalanced brackets, parentheses, or quotes. Look for missing semicolons or commas. Use a code editor with syntax highlighting to help spot these issues.",
         "code_example": """
 // Examples of syntax errors:
+
 // Missing closing parenthesis
 if (x === 5 {  // Should be: if (x === 5) {
   doSomething();
@@ -1149,8 +1071,8 @@ public class Example {
     {
         "regex": r"incompatible types: (.*) cannot be converted to (.*)",
         "title": "Java Type Conversion Error",
-        "explanation": "Java is strongly typed and cannot automatically convert between incompatible types. You're trying to assign a value of type {{$1}} to a variable of type {{$2}}.",
-        "solution": "You need to either use compatible types or explicitly cast the value to the required type if it's a valid conversion. In some cases, you might need to use appropriate conversion methods.",
+        "explanation": "Java is strongly typed and cannot automatically convert between incompatible types. You're trying to assign a value of type {{$1}} to a variable of type {{$2}}. This is not allowed without an explicit cast if the types are compatible.",
+        "solution": "Use proper type casting if the conversion is valid. Ensure you're using compatible types. For primitive types, use wrapper classes or appropriate conversion methods.",
         "difficulty": "beginner",
         "code_example": """
 // Example fix for incompatible types
@@ -1282,7 +1204,37 @@ if (input.matches("\\d+")) {
     System.out.println("Not a valid number");
 }
 """
-    }
+    },
+    {
+        "regex": r"Exception in thread \"[^\"]*\" java\.lang\.ArrayIndexOutOfBoundsException(?:: (Index )?(\d+)(?:.*))?",
+        "title": "Array Index Out of Bounds Exception",
+        "explanation": "Your code tried to access an array element at an index that does not exist. Arrays in Java are zero-indexed, and you can only access elements from index 0 to length-1.",
+        "solution": "Check array indices before accessing elements. Ensure loop conditions do not exceed array boundaries. Remember that array indices start at 0, not 1.",
+        "code_example": """
+// Problem:
+int[] numbers = new int[5];  // Creates array with indices 0-4
+int value = numbers[5];  // Error: Index 5 out of bounds
+
+// Solution 1: Fix the index
+int value = numbers[4];  // Correct: access the last element
+
+// Solution 2: Check bounds before accessing
+if (index >= 0 && index < numbers.length) {
+    int value = numbers[index];
+} else {
+    System.out.println("Index out of bounds: " + index);
+}
+
+// Solution 3: Use a try-catch block
+try {
+    int value = numbers[index];
+} catch (ArrayIndexOutOfBoundsException e) {
+    System.out.println("Invalid index: " + index);
+}
+""",
+        "related_errors": ["StringIndexOutOfBoundsException", "IndexOutOfBoundsException"],
+        "difficulty": "beginner",
+    },
 ]
 
 # Ruby error patterns
@@ -1327,20 +1279,23 @@ some_variable.to_s  # For example, convert to string
         "regex": r"ArgumentError: wrong number of arguments \(given (\d+), expected (\d+)\)",
         "title": "Ruby Wrong Number of Arguments Error",
         "explanation": "This error occurs when you call a method with {{$1}} arguments, but it expects {{$2}} arguments.",
-        "solution": "Check the method's documentation to see how many arguments it expects. Adjust your code to provide the correct number of arguments.",
+        "solution": "Check the method's documentation to see the correct number of required arguments. Make sure you're passing all required arguments, and not passing too many.",
         "difficulty": "beginner",
         "code_example": """
-# Example fix for wrong number of arguments
-# Instead of:
-# my_method(arg1, arg2, arg3)  # Too many arguments
-
-# Check the method definition
-def my_method(arg1, arg2)
-  # Method only expects 2 arguments
+# Method definition:
+def greet(name, greeting = "Hello")
+  puts "#{greeting}, #{name}!"
 end
 
-# Correct the call
-my_method(arg1, arg2)  # Correct number of arguments
+# Problem (too few arguments):
+greet()  # ArgumentError: wrong number of arguments (given 0, expected 1..2)
+
+# Problem (too many arguments):
+greet("Ruby", "Hi", "Extra")  # ArgumentError: wrong number of arguments (given 3, expected 1..2)
+
+# Correct usage:
+greet("Ruby")  # Works: uses default greeting
+greet("Ruby", "Hi")  # Works: specifies both arguments
 """
     },
     {
@@ -1496,23 +1451,62 @@ end
 """
     },
     {
-        "regex": r"NoMethodError: undefined method `([^']+)' for ([^:]+):([^:]+)",
+        "regex": r"NoMethodError: undefined method `([^']+)' for ([^:]+)",
         "title": "Undefined Method '{{$1}}' for {{$2}}",
-        "explanation": "You're trying to call a method named '{{$1}}' on an object of type {{$3}}, but that method doesn't exist for this type of object.",
+        "explanation": "You're trying to call a method named '{{$1}}' on an object of type {{$2}}, but this object doesn't have that method.",
         "solution": "Make sure you're calling the correct method for this object type. Check the documentation to see what methods are available. Check for typos in method names.",
         "difficulty": "beginner",
         "code_example": """
 # Incorrect:
 number = 42
-number.each { |n| puts n }  # Error: undefined method 'each' for Integer
+number.each { |n| puts n }  # NoMethodError: undefined method 'each' for 42:Integer
 
-# Correct:
+# Solutions:
+# Option 1: Use the correct method for integers
 number = 42
-puts number  # Just print the number directly
+number.times { |n| puts n }  # Works fine
 
-# Or if you meant to iterate over a range:
-(1..number).each { |n| puts n }  # Works on a Range object
-"""
+# Option 2: Convert to a collection if you need 'each'
+[number].each { |n| puts n }  # Works fine
+
+# Option 3: Check object type before calling a method
+if number.respond_to?(:each)
+  number.each { |n| puts n }
+else
+  puts "Can't iterate over #{number.class}"
+end
+""",
+        "related_errors": ["undefined method", "method missing"],
+        "difficulty": "beginner",
+    },
+    {
+        "regex": r"NameError: uninitialized constant ([^\s]+)",
+        "title": "Uninitialized Constant: {{$1}}",
+        "explanation": "Ruby couldn't find a constant (class, module, or constant variable) named '{{$1}}'. This often happens when you reference a class that either doesn't exist or hasn't been properly required/imported.",
+        "solution": "Check the spelling of the constant name. Make sure you've required the file or gem that defines the constant. If using a namespaced constant, use the correct namespace or full path.",
+        "code_example": """
+# Problem (undefined class):
+user = User.new  # NameError: uninitialized constant User
+
+# Solutions:
+# Option 1: Define the class
+class User
+  attr_accessor :name
+end
+user = User.new  # Now it works
+
+# Option 2: Require the file containing the class
+require 'user'  # Assuming User is defined in user.rb
+user = User.new
+
+# Option 3: Use the correct namespace
+user = MyApp::User.new  # If User is in the MyApp module
+
+# Option 4: Use constant lookup with module
+user = ::User.new  # Look for User in the global namespace
+""",
+        "related_errors": ["uninitialized constant", "NameError"],
+        "difficulty": "intermediate",
     },
 ]
 

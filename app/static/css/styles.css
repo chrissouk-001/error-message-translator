@@ -984,7 +984,7 @@ footer a:hover {
     padding-left: 0;
     counter-reset: step-counter;
     display: flex;
-    flex-direction: column;
+        flex-direction: column;
     gap: var(--space-6);
 }
 
