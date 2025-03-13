@@ -196,11 +196,13 @@
     <!-- How It Works Modal -->
     <div id="help-modal" class="modal">
         <div class="modal-content">
-            <button class="modal-close" aria-label="Close modal" onclick="return closeHelpModal();"><i class="fas fa-times"></i></button>
-            <h2><i class="fas fa-question-circle"></i> How It Works</h2>
-            <div class="modal-body">
+            <div class="modal-header">
+                <button class="modal-close" aria-label="Close modal" onclick="return closeHelpModal();"><i class="fas fa-times"></i></button>
+                <h2><i class="fas fa-question-circle"></i> How It Works</h2>
                 <p>Error Message Translator helps you understand confusing programming errors by translating them into simple, beginner-friendly explanations.</p>
-                
+            </div>
+            
+            <div class="modal-body">
                 <ol>
                     <li><strong>Paste</strong> your error message in the input box</li>
                     <li><strong>Select</strong> your programming language (or use auto-detect)</li>
@@ -208,7 +210,7 @@
                     <li><strong>Get</strong> a clear explanation, solution, and code example</li>
                 </ol>
                 
-                <p>Currently supported languages:</p>
+                <h3>Supported Languages</h3>
                 <ul class="language-list">
                     <li><i class="fab fa-python"></i> Python</li>
                     <li><i class="fab fa-js-square"></i> JavaScript</li>
@@ -217,8 +219,10 @@
                     <li><i class="fab fa-html5"></i> HTML</li>
                     <li><i class="fab fa-css3-alt"></i> CSS</li>
                 </ul>
-                
-                <p>This app runs entirely in your browser and doesn't send your code to any external servers.</p>
+            </div>
+            
+            <div class="modal-footer">
+                <p><i class="fas fa-shield-alt security-icon"></i> This app runs entirely in your browser and doesn't send your code to any external servers.</p>
             </div>
         </div>
     </div>
