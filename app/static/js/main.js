@@ -242,6 +242,26 @@ function initTheme() {
 }
 
 /**
+ * Initialize the output language selector
+ */
+function initializeOutputLanguage() {
+    const outputLanguageSelector = document.getElementById('output-language');
+    if (outputLanguageSelector) {
+        // Set default language
+        outputLanguageSelector.value = 'en';
+        
+        // Add event listener for language change
+        outputLanguageSelector.addEventListener('change', function() {
+            // You can add functionality here to handle language changes
+            // For example, retranslate the current error message
+            if (document.getElementById('error-input').value.trim()) {
+                translateError();
+            }
+        });
+    }
+}
+
+/**
  * Toggle between light and dark themes
  */
 function toggleTheme() {
@@ -282,6 +302,7 @@ function updateThemeIcon(theme) {
  */
 function updateCodeTheme(theme) {
     const prismThemeLink = document.getElementById('prism-theme');
+    
     if (prismThemeLink) {
         const themeUrl = theme === 'dark'
             ? 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css'
@@ -290,7 +311,8 @@ function updateCodeTheme(theme) {
         prismThemeLink.href = themeUrl;
         
         // Reapply syntax highlighting if code examples are present
-        if (window.Prism && codeExample.textContent.trim()) {
+        const codeExample = document.getElementById('code-example');
+        if (window.Prism && codeExample && codeExample.textContent.trim()) {
             Prism.highlightElement(codeExample);
         }
     }
