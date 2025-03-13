@@ -13,136 +13,116 @@ The Error Message Translator provides a clean, intuitive interface for translati
 
 ## Features
 
-- **Error Message Translation**: Converts complex error messages into beginner-friendly explanations
-- **Multi-language Support**: Works with Python, JavaScript, HTML, and CSS errors
-- **Code Examples**: Provides practical code examples showing how to fix each error
-- **Copy to Clipboard**: Easily copy code solutions
-- **Recent Searches**: Keep track of your recently translated errors
-- **Responsive Design**: Works well on desktop and mobile devices
-
-## Tech Stack
-
-- **Frontend**: HTML, CSS, JavaScript
-- **Backend**: Python with Flask
-- **Storage**: Browser localStorage for recent searches
-- **Testing**: pytest with coverage reporting
-- **Code Quality**: flake8, black, pre-commit hooks
-
-## Prerequisites
-
-Before running this application, you need to have the following installed:
-
-- Python 3.8 or higher
-- pip (Python package manager)
-
-## Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/chrissouk-001/error-message-translator.git
-   cd error-message-translator
-   ```
-
-2. Create a virtual environment (optional but recommended):
-   ```bash
-   python -m venv .venv
-   
-   # On Windows:
-   .venv\Scripts\activate
-   
-   # On macOS/Linux:
-   source .venv/bin/activate
-   ```
-
-3. Install dependencies:
-   ```bash
-   # Install main dependencies
-   pip install -r requirements.txt
-   
-   # For development, install with dev extras
-   pip install -e ".[dev]"
-   
-   # Set up pre-commit hooks
-   pip install pre-commit
-   pre-commit install
-   ```
-
-## Development
-
-This project follows standard Python development practices:
-
-### Running the Application
-
-```bash
-# Using Python directly
-python app.py
-```
-
-The application will be available at [http://localhost:5001](http://localhost:5001).
-
-### Running Tests
-
-```bash
-# Using pytest directly
-pytest
-
-# With coverage
-pytest --cov=app
-```
-
-### Code Formatting and Linting
-
-```bash
-# Check formatting with Black
-black --check app tests
-
-# Format code with Black
-black app tests
-
-# Run linting checks
-flake8 app tests
-```
+- Supports multiple programming languages:
+  - Python
+  - JavaScript
+  - Java
+  - Ruby
+  - HTML
+  - CSS
+  - General error patterns
+- Provides clear explanations of error messages
+- Offers step-by-step solutions
+- Includes code examples showing how to fix common errors
+- Automatic language detection
 
 ## Project Structure
 
 ```
-error-message-translator/
-├── app/                    # Main application package
-│   ├── __init__.py         # Package initialization
-│   ├── data/               # Data module
-│   │   └── error_patterns.py # Error pattern definitions
-│   ├── static/             # Static assets
-│   │   ├── css/            # Stylesheets
-│   │   └── js/             # JavaScript files
-│   ├── templates/          # HTML templates
-│   │   └── index.html      # Main template
-│   └── translator.py       # Core translation logic
-├── tests/                  # Test suite
-│   ├── unit/               # Unit tests
-│   └── integration/        # Integration tests
-├── app.py                  # Application entry point
-├── setup.py                # Package setup
-├── pyproject.toml          # Project configuration
-├── pytest.ini              # pytest configuration
-├── requirements.txt        # Dependencies
-├── .pre-commit-config.yaml # Pre-commit hooks configuration
-├── .flake8                 # flake8 configuration
-├── .editorconfig           # Editor configuration
-├── CHANGELOG.md            # Version changelog
-├── CONTRIBUTING.md         # Contribution guidelines
-├── LICENSE                 # MIT License
-└── README.md               # This file
+error-msg-translator/
+├── app/                      # Main application package
+│   ├── __init__.py           # Flask application initialization
+│   ├── translator.py         # Core translation functionality
+│   ├── data/                 # Error pattern data
+│   │   ├── error_patterns.py # Aggregates all error patterns
+│   │   ├── patterns/         # Organized error patterns by language
+│   │   │   ├── python/       # Python error patterns
+│   │   │   ├── javascript/   # JavaScript error patterns
+│   │   │   ├── java/         # Java error patterns
+│   │   │   ├── ruby/         # Ruby error patterns
+│   │   │   ├── html/         # HTML error patterns
+│   │   │   ├── css/          # CSS error patterns
+│   │   │   └── general/      # General error patterns
+│   ├── static/               # Static assets (CSS, JS, images)
+│   └── templates/            # HTML templates
+├── scripts/                  # Utility scripts
+│   └── add_patterns.py       # Script to add new error patterns
+└── requirements.txt          # Python dependencies
 ```
 
-## TODOs
+## Error Pattern Structure
 
-- [x] Implement additional language support (added Java and Ruby)
-- [x] Enhance error detection accuracy (improved with weighted scoring system)
-- [x] Improve mobile responsiveness and accessibility
-- [ ] Add user authentication and profile management
-- [ ] Integrate with popular IDEs and code editors
-- [ ] Create an API documentation page
-- [ ] Add support for command-line errors (Bash, PowerShell)
-- [ ] Implement internationalization (i18n) for multiple languages
-- [ ] Add error analytics and statistics dashboard
-- [ ] Enable browser extension development
+Each error pattern follows this structure:
+
+```python
+{
+    "regex": r"pattern_to_match_error",
+    "title": "Error Title",
+    "explanation": "Beginner-friendly explanation",
+    "solution": "Steps to fix the error",
+    "code_example": """
+    # Example code showing the error
+    # and how to fix it
+    """,
+    "related_errors": ["Similar error 1", "Similar error 2"],
+    "difficulty": "beginner|intermediate|advanced"
+}
+```
+
+Placeholders in the form `{{$N}}` can be used to reference captured groups from the regular expression.
+
+## Adding New Error Patterns
+
+To add new error patterns:
+
+1. Identify the appropriate language module in `app/data/patterns/`
+2. Add your pattern to the corresponding file
+3. Follow the pattern structure shown above
+4. Make sure your regex is accurate and captures relevant parts of the error
+5. Provide a clear explanation and solution
+6. Include a code example if possible
+
+## Running the Application
+
+1. Install dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+
+2. Run the Flask application:
+   ```
+   flask run
+   ```
+
+3. Open your browser and navigate to `http://localhost:5000`
+
+## API Usage
+
+The application provides a simple API for error translation:
+
+```
+POST /api/translate
+Content-Type: application/json
+
+{
+    "error_message": "Your error message here",
+    "language": "auto"  // or specify: python, javascript, java, ruby, html, css, general
+}
+```
+
+Response:
+
+```json
+{
+    "title": "Error Title",
+    "explanation": "Beginner-friendly explanation",
+    "solution": "Steps to fix the error",
+    "code_example": "Example code",
+    "language": "detected_language",
+    "difficulty": "beginner"
+}
+```
+
+## License
+
+MIT

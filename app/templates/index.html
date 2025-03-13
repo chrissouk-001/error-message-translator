@@ -23,6 +23,102 @@
     </script>
 </head>
 <body>
+    <!-- Debugging script -->
+    <script>
+        // Override console.log to make it more visible
+        const originalConsoleLog = console.log;
+        console.log = function() {
+            // Call original console.log
+            originalConsoleLog.apply(console, arguments);
+            
+            // Create a log element to display in the page
+            const logContainer = document.getElementById('debug-logs');
+            if (logContainer) {
+                const logEntry = document.createElement('div');
+                logEntry.className = 'debug-log';
+                
+                // Convert all arguments to strings
+                const logMessage = Array.prototype.slice.call(arguments)
+                    .map(arg => {
+                        if (typeof arg === 'object') {
+                            try {
+                                return JSON.stringify(arg);
+                            } catch (e) {
+                                return String(arg);
+                            }
+                        }
+                        return String(arg);
+                    })
+                    .join(' ');
+                
+                logEntry.textContent = logMessage;
+                logContainer.appendChild(logEntry);
+                
+                // Scroll to bottom
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+        };
+        
+        // Also override console.error for better visibility
+        const originalConsoleError = console.error;
+        console.error = function() {
+            // Call original console.error
+            originalConsoleError.apply(console, arguments);
+            
+            // Create a log element to display in the page
+            const logContainer = document.getElementById('debug-logs');
+            if (logContainer) {
+                const logEntry = document.createElement('div');
+                logEntry.className = 'debug-log error';
+                
+                // Convert all arguments to strings
+                const logMessage = Array.prototype.slice.call(arguments)
+                    .map(arg => {
+                        if (typeof arg === 'object') {
+                            try {
+                                return JSON.stringify(arg);
+                            } catch (e) {
+                                return String(arg);
+                            }
+                        }
+                        return String(arg);
+                    })
+                    .join(' ');
+                
+                logEntry.textContent = logMessage;
+                logContainer.appendChild(logEntry);
+                
+                // Scroll to bottom
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+        };
+        
+        // Add a debug log container
+        document.addEventListener('DOMContentLoaded', function() {
+            const debugContainer = document.createElement('div');
+            debugContainer.id = 'debug-logs';
+            debugContainer.className = 'debug-container';
+            debugContainer.style.cssText = 'position: fixed; bottom: 0; right: 0; width: 400px; height: 200px; overflow: auto; background: rgba(0,0,0,0.8); color: white; font-family: monospace; font-size: 10px; padding: 10px; z-index: 9999; display: none;';
+            document.body.appendChild(debugContainer);
+            
+            // Add toggle button
+            const toggleButton = document.createElement('button');
+            toggleButton.textContent = 'Show Debug';
+            toggleButton.style.cssText = 'position: fixed; bottom: 0; right: 0; z-index: 10000; font-size: 10px; padding: 2px 5px; background: #333; color: white; border: none;';
+            toggleButton.addEventListener('click', function() {
+                const logs = document.getElementById('debug-logs');
+                if (logs.style.display === 'none') {
+                    logs.style.display = 'block';
+                    this.textContent = 'Hide Debug';
+                } else {
+                    logs.style.display = 'none';
+                    this.textContent = 'Show Debug';
+                }
+            });
+            document.body.appendChild(toggleButton);
+        });
+    </script>
+    
     <!-- Accessibility announcer for screen readers -->
     <div id="a11y-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
     
@@ -138,12 +234,12 @@
                     
                     <div class="explanation">
                         <h3><i class="fas fa-lightbulb"></i> What It Means</h3>
-                        <p id="explanation-text"></p>
+                        <p id="explanation">This is where the explanation will appear</p>
                     </div>
                     
                     <div class="solution">
                         <h3><i class="fas fa-wrench"></i> How To Fix It</h3>
-                        <p id="solution-text"></p>
+                        <p id="solution">This is where the solution will appear</p>
                     </div>
                     
                     <div id="code-example-section" class="code-example hidden">
@@ -266,7 +362,11 @@
             
             // Get selected language
             const languageInput = document.getElementById('language-input');
-            const language = languageInput ? languageInput.value : 'auto';
+            let language = 'auto';
+            if (languageInput && languageInput.value) {
+                language = languageInput.value;
+            }
+            console.log('Fallback using language:', language);
             
             // Make the API request
             fetch('/api/translate', {
@@ -285,25 +385,58 @@
                 return response.json();
             })
             .then(result => {
-                console.log('Translation result:', result);
+                console.log('Translation result from fallback:', result);
                 
                 // Hide placeholder, show result
-                document.getElementById('result-placeholder').style.display = 'none';
+                const resultPlaceholder = document.getElementById('result-placeholder');
+                if (resultPlaceholder) {
+                    resultPlaceholder.style.display = 'none';
+                }
+                
                 const translationResult = document.getElementById('translation-result');
-                translationResult.style.display = 'block';
-                translationResult.classList.remove('hidden');
+                if (translationResult) {
+                    translationResult.style.display = 'block';
+                    translationResult.classList.remove('hidden');
+                }
                 
                 // Set the error title
-                document.getElementById('error-title').textContent = result.title || 'Error';
+                const errorTitle = document.getElementById('error-title');
+                if (errorTitle) {
+                    errorTitle.textContent = 
+                        result.title || (result.language ? `${result.language} Error` : 'Error Translation');
+                }
                 
-                // Set the original error
-                document.getElementById('original-error').textContent = result.original_error || '';
+                // Set the original error - handle both possible field names
+                const errorText = result.error || result.original_error || '';
+                const originalError = document.getElementById('original-error');
+                if (originalError) {
+                    originalError.textContent = errorText;
+                }
                 
                 // Set the explanation
-                document.getElementById('explanation-text').textContent = result.explanation || '';
+                const explanation = document.getElementById('explanation-text') || document.getElementById('explanation');
+                if (explanation) {
+                    explanation.textContent = result.explanation || 'No explanation available';
+                }
                 
                 // Set the solution
-                document.getElementById('solution-text').textContent = result.solution || '';
+                const solution = document.getElementById('solution-text') || document.getElementById('solution');
+                if (solution) {
+                    solution.textContent = result.solution || 'No solution available';
+                }
+                
+                // Set the language badge
+                const languageBadge = document.getElementById('language-badge');
+                if (languageBadge && result.language) {
+                    const capitalized = result.language.charAt(0).toUpperCase() + result.language.slice(1);
+                    languageBadge.textContent = capitalized;
+                    languageBadge.dataset.language = result.language;
+                }
+                
+                // Scroll to result
+                if (translationResult) {
+                    translationResult.scrollIntoView({ behavior: 'smooth' });
+                }
             })
             .catch(error => {
                 console.error('Translation failed:', error);

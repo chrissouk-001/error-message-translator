@@ -10,6 +10,7 @@ const errorInput = document.getElementById('error-message');
 const languageSelect = document.getElementById('language-input');
 const translateBtn = document.getElementById('translate-btn');
 const clearBtn = document.getElementById('clear-btn');
+const copyBtn = document.getElementById('copy-btn');
 const resultPlaceholder = document.getElementById('result-placeholder');
 const translationContent = document.getElementById('translation-result');
 const outputLanguageSelect = document.getElementById('output-language-select');
@@ -21,6 +22,7 @@ const toast = document.getElementById('toast');
 const toastMessage = document.querySelector('.toast-message');
 const toastClose = document.querySelector('.toast-close');
 const themeToggle = document.getElementById('theme-toggle');
+const howItWorksBtn = document.getElementById('how-it-works-btn');
 
 // Constants
 const MAX_RECENT_SEARCHES = 5;
@@ -444,6 +446,8 @@ async function translateError() {
         errorInputValue: errorInput ? errorInput.value : 'undefined',
         translateBtn: !!translateBtn,
         loadingOverlay: !!document.getElementById('loading-overlay'),
+        languageSelect: !!languageSelect,
+        selectedLanguage: languageSelect ? languageSelect.value : 'undefined'
     });
     
     const errorMessage = errorInput.value.trim();
@@ -458,8 +462,11 @@ async function translateError() {
     showLoading(true);
     
     try {
-        // Get selected language
-        const language = languageSelect.value;
+        // Get selected language, ensure it's a valid value
+        let language = 'auto';
+        if (languageSelect && languageSelect.value) {
+            language = languageSelect.value;
+        }
         console.log('Selected language:', language);
         
         // Build the API URL
@@ -471,7 +478,7 @@ async function translateError() {
         console.log('API URL:', apiUrl);
         
         // Make the API request
-        console.log('Making API request...');
+        console.log('Making API request with language:', language);
         const response = await fetch(apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -498,6 +505,26 @@ async function translateError() {
         // Display the translation
         displayTranslation(result);
         
+        // Update language selector to match the detected language
+        if (language === 'auto' && result.language && languageSelect) {
+            console.log('Auto-detected language:', result.language);
+            // Only update the UI, don't trigger another translation
+            const options = Array.from(languageSelect.options);
+            const foundOption = options.find(option => option.value === result.language);
+            if (foundOption) {
+                // No need to change the selection as it should stay as auto
+                console.log('Language detected:', result.language);
+            }
+        }
+        
+        // Set the language badge
+        const languageBadge = document.getElementById('language-badge');
+        if (languageBadge && result.language) {
+            languageBadge.textContent = capitalizeFirstLetter(result.language);
+            languageBadge.dataset.language = result.language;
+            console.log('Updated language badge to:', result.language);
+        }
+        
         // Save to recent searches
         addToRecentSearches(result);
         
@@ -512,102 +539,91 @@ async function translateError() {
 /**
  * Display the translation result
  */
-function displayTranslation(result) {
-    console.log("Displaying translation:", result);
+function displayTranslation(translation) {
+    console.log('Displaying translation:', translation);
     
-    // Hide the result placeholder and show the translation content
-    resultPlaceholder.style.display = 'none';
-    translationContent.style.display = 'block';
+    // Hide placeholder and show result
+    if (resultPlaceholder) resultPlaceholder.style.display = 'none';
+    if (translationContent) {
+        translationContent.style.display = 'block';
+        translationContent.classList.remove('hidden');
+    }
     
-    // Update the translation title and error details
-    document.getElementById('error-title').textContent = result.title || 'Error Translation';
+    // Get error text - handle both possible field names
+    const errorText = translation.error || translation.original_error || '';
     
-    // Update language badge
+    // Update error title
+    const errorTitle = document.getElementById('error-title');
+    if (errorTitle) {
+        const title = translation.title || (translation.language ? `${translation.language} Error` : 'Error Translation');
+        errorTitle.textContent = title;
+        console.log('Set error title to:', title);
+    }
+    
+    // Set original error text
+    const originalError = document.getElementById('original-error');
+    if (originalError) {
+        originalError.textContent = errorText;
+        console.log('Set original error to:', errorText.substring(0, 50) + (errorText.length > 50 ? '...' : ''));
+    }
+    
+    // Set explanation
+    const explanation = document.getElementById('explanation-text') || document.getElementById('explanation');
+    if (explanation) {
+        explanation.textContent = translation.explanation || 'No explanation available';
+        console.log('Updated explanation with:', translation.explanation);
+    } else {
+        console.error('Could not find explanation element with ID "explanation" or "explanation-text"');
+    }
+    
+    // Set solution
+    const solution = document.getElementById('solution-text') || document.getElementById('solution');
+    if (solution) {
+        solution.textContent = translation.solution || 'No solution available';
+        console.log('Updated solution with:', translation.solution);
+    } else {
+        console.error('Could not find solution element with ID "solution" or "solution-text"');
+    }
+    
+    // Set language badge
     const languageBadge = document.getElementById('language-badge');
-    if (languageBadge) {
-        languageBadge.textContent = capitalizeFirstLetter(result.language || 'unknown');
-        languageBadge.className = `language-badge ${result.language}`;
+    if (languageBadge && translation.language) {
+        const capitalized = capitalizeFirstLetter(translation.language);
+        languageBadge.textContent = capitalized;
+        languageBadge.dataset.language = translation.language;
+        console.log('Set language badge to:', capitalized);
     }
     
-    // Update difficulty badge if available
+    // Set difficulty badge
     const difficultyBadge = document.getElementById('difficulty-badge');
-    if (difficultyBadge) {
-        if (result.difficulty) {
-            difficultyBadge.textContent = capitalizeFirstLetter(result.difficulty);
-            difficultyBadge.className = `difficulty-badge ${result.difficulty}`;
-            difficultyBadge.style.display = 'inline-flex';
-        } else {
-            difficultyBadge.style.display = 'none';
-        }
+    if (difficultyBadge && translation.difficulty) {
+        const capitalized = capitalizeFirstLetter(translation.difficulty);
+        difficultyBadge.textContent = capitalized;
+        difficultyBadge.dataset.difficulty = translation.difficulty;
+        console.log('Set difficulty badge to:', capitalized);
     }
     
-    // Update the original error
-    const originalErrorPre = document.getElementById('original-error');
-    originalErrorPre.textContent = result.original_error || '';
-    
-    // Update explanation
-    document.getElementById('explanation-text').textContent = result.explanation || 'No explanation available.';
-    
-    // Update solution
-    document.getElementById('solution-text').textContent = result.solution || 'No solution available.';
-    
-    // Add to recent searches
-    addToRecentSearches(result);
-    
-    // Handle code example if present
-    const codeExampleContainer = document.getElementById('code-example-container');
-    const codeExampleElement = document.getElementById('code-example');
-    
-    if (result.code_example && codeExampleElement) {
-        codeExampleElement.textContent = result.code_example;
-        
-        // Set the language class for syntax highlighting
-        const languageClass = getPrismLanguageClass(result.language);
-        codeExampleElement.className = `language-${languageClass}`;
+    // Set code example if available
+    const codeExampleSection = document.getElementById('code-example-section');
+    const codeExample = document.getElementById('code-example');
+    if (codeExampleSection && codeExample && translation.code_example) {
+        codeExample.textContent = translation.code_example;
+        codeExampleSection.classList.remove('hidden');
         
         // Apply syntax highlighting
-        if (window.Prism) {
-            Prism.highlightElement(codeExampleElement);
+        if (translation.language && typeof Prism !== 'undefined') {
+            const prismLanguage = getPrismLanguageClass(translation.language);
+            codeExample.className = `language-${prismLanguage}`;
+            Prism.highlightElement(codeExample);
+            console.log(`Applied syntax highlighting with language: ${prismLanguage}`);
         }
-        
-        codeExampleContainer.style.display = 'block';
-    } else {
-        codeExampleContainer.style.display = 'none';
+    } else if (codeExampleSection) {
+        codeExampleSection.classList.add('hidden');
     }
     
-    // Handle related errors if present
-    const relatedErrorsContainer = document.getElementById('related-errors-container');
-    const relatedErrorsList = document.getElementById('related-errors-list');
-    
-    if (result.related_errors && result.related_errors.length > 0 && relatedErrorsList) {
-        // Clear existing items
-        relatedErrorsList.innerHTML = '';
-        
-        // Add new related errors
-        result.related_errors.forEach(error => {
-            const li = document.createElement('li');
-            li.textContent = error;
-            relatedErrorsList.appendChild(li);
-        });
-        
-        relatedErrorsContainer.style.display = 'block';
-    } else {
-        relatedErrorsContainer.style.display = 'none';
-    }
-    
-    // Create share button if it doesn't exist
-    createShareButton();
-    
-    // Scroll to the translation section
-    translationContent.scrollIntoView({ behavior: 'smooth' });
-    
-    // Focus on the translation result for accessibility
-    focusElement(document.getElementById('error-title'));
-    
-    // Announce the translation to screen readers
-    const announcer = document.getElementById('a11y-announcer');
-    if (announcer) {
-        announcer.textContent = `Translation complete: ${result.title}`;
+    // Make sure the result is visible
+    if (translationContent) {
+        translationContent.scrollIntoView({ behavior: 'smooth' });
     }
 }
 
