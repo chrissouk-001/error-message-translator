@@ -14,6 +14,13 @@ const resultPlaceholder = document.getElementById('result-placeholder');
 const translationContent = document.getElementById('translation-content');
 const outputLanguageSelect = document.getElementById('output-language-select');
 const recentSearchesContainer = document.getElementById('searches-container');
+const helpBtn = document.getElementById('help-btn');
+const modal = document.getElementById('help-modal');
+const modalClose = document.querySelector('.modal-close');
+const toast = document.getElementById('toast');
+const toastMessage = document.querySelector('.toast-message');
+const toastClose = document.querySelector('.toast-close');
+const themeToggle = document.getElementById('theme-toggle');
 
 // Constants
 const MAX_RECENT_SEARCHES = 5;
@@ -23,14 +30,14 @@ const THEME_STORAGE_KEY = 'error_translator_theme';
 /**
  * Initialize the application
  */
-function init() {
+function initApp() {
     console.log('Initializing application...');
     
     // Check if we're on the right port
     checkPort();
     
     // Initialize the theme
-    initializeTheme();
+    initTheme();
     
     // Initialize the output language selector
     initializeOutputLanguage();
@@ -45,9 +52,33 @@ function init() {
     loadRecentSearches();
     
     // Add event listeners
-    const clearBtn = document.getElementById('clear-btn');
     const copyCodeBtn = document.getElementById('copy-code-btn');
     const copyResultBtn = document.getElementById('copy-result-btn');
+    
+    if (helpBtn && modal) {
+        helpBtn.addEventListener('click', function() {
+            console.log('How It Works button clicked');
+            modal.classList.add('show');
+        });
+        
+        if (modalClose) {
+            modalClose.addEventListener('click', function() {
+                modal.classList.remove('show');
+            });
+        }
+        
+        // Also close when clicked outside
+        window.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                modal.classList.remove('show');
+            }
+        });
+    }
+    
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+        console.log('Theme toggle event listener attached');
+    }
     
     if (clearBtn) {
         clearBtn.addEventListener('click', clearInput);
@@ -192,7 +223,7 @@ function checkPort() {
 /**
  * Initialize theme based on saved preference or system preference
  */
-function initializeTheme() {
+function initTheme() {
     const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
     
     if (savedTheme) {
@@ -231,6 +262,9 @@ function toggleTheme() {
  * @param {string} theme - The current theme ('light' or 'dark')
  */
 function updateThemeIcon(theme) {
+    const themeToggle = document.getElementById('theme-toggle');
+    if (!themeToggle) return;
+    
     themeToggle.innerHTML = theme === 'dark' 
         ? '<i class="fas fa-sun"></i>' 
         : '<i class="fas fa-moon"></i>';
@@ -895,11 +929,14 @@ document.addEventListener('DOMContentLoaded', function() {
         errorInput: !!document.getElementById('error-input'),
         languageSelect: !!document.getElementById('language-select'),
         outputLanguageSelect: !!document.getElementById('output-language-select'),
-        translateBtn: !!document.getElementById('translate-btn')
+        translateBtn: !!document.getElementById('translate-btn'),
+        helpBtn: !!document.getElementById('help-btn'),
+        modal: !!document.getElementById('help-modal'),
+        themeToggle: !!document.getElementById('theme-toggle')
     });
     
     // Initialize the application
-    init();
+    initApp();
     
     // Double-check button connections
     const translateBtn = document.getElementById('translate-btn');
@@ -908,6 +945,68 @@ document.addEventListener('DOMContentLoaded', function() {
         translateBtn.addEventListener('click', translateError);
     } else {
         console.error('Translate button not found!');
+    }
+    
+    // Explicitly add event listeners for the help button and theme toggle again
+    // This ensures they work even if there were issues during initApp()
+    const helpBtn = document.getElementById('help-btn');
+    const modal = document.getElementById('help-modal');
+    const modalClose = document.querySelector('.modal-close');
+    const themeToggle = document.getElementById('theme-toggle');
+    
+    console.log('Help button found:', !!helpBtn);
+    console.log('Modal found:', !!modal);
+    console.log('Theme toggle found:', !!themeToggle);
+    
+    if (helpBtn && modal) {
+        helpBtn.addEventListener('click', function() {
+            console.log('How It Works button clicked (direct)');
+            modal.classList.add('show');
+            // Ensure the modal is visible by forcing display style
+            modal.style.display = 'flex';
+        });
+        
+        if (modalClose) {
+            modalClose.addEventListener('click', function() {
+                console.log('Modal close clicked');
+                modal.classList.remove('show');
+                // Ensure the modal is hidden
+                setTimeout(() => modal.style.display = 'none', 50);
+            });
+        }
+        
+        // Also close when clicked outside
+        window.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                console.log('Clicked outside modal');
+                modal.classList.remove('show');
+                // Ensure the modal is hidden
+                setTimeout(() => modal.style.display = 'none', 50);
+            }
+        });
+    }
+    
+    if (themeToggle) {
+        themeToggle.addEventListener('click', function() {
+            console.log('Theme toggle clicked (direct)');
+            // Get current theme
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            console.log('Current theme:', currentTheme);
+            
+            // Toggle theme
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            console.log('New theme:', newTheme);
+            
+            // Update DOM and save preference
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem(THEME_STORAGE_KEY, newTheme);
+            
+            // Update theme icon
+            updateThemeIcon(newTheme);
+            
+            // Update Prism theme if syntax highlighting is present
+            updateCodeTheme(newTheme);
+        });
     }
 });
 

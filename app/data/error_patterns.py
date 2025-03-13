@@ -139,27 +139,21 @@ else:
     {
         "regex": r"RecursionError: maximum recursion depth exceeded",
         "title": "Maximum Recursion Depth Exceeded",
-        "explanation": "Your code has a recursive function that's calling itself too many times, exceeding Python's limit for recursion depth. This often happens when a recursive function doesn't have a proper base case to stop the recursion.",
-        "solution": "Ensure your recursive function has a proper base case that will eventually be reached. Consider rewriting your algorithm to use iteration instead of recursion for very large inputs.",
+        "explanation": "Your code contains a function that is calling itself too many times. This usually happens when a recursive function doesn't have a proper exit condition, creating an infinite loop of function calls.",
+        "solution": "Check your recursive function and make sure it has a proper base case that will eventually be reached. Also consider if the problem could be solved using iteration instead of recursion.",
         "code_example": """
-# Problematic recursive function (will cause RecursionError)
+# Incorrect (infinite recursion):
 def factorial(n):
-    return n * factorial(n-1)  # Missing base case!
+    return n * factorial(n-1)  # No base case!
 
-# Corrected version with base case
+# Correct:
 def factorial(n):
     if n <= 1:  # Base case
         return 1
     return n * factorial(n-1)
-
-# Alternative iterative approach
-def factorial_iterative(n):
-    result = 1
-    for i in range(1, n+1):
-        result *= i
-    return result
 """,
-        "difficulty": "advanced",
+        "related_errors": ["StackOverflowError"],
+        "difficulty": "intermediate",
     },
     {
         "regex": r"IndexError: list index out of range",
@@ -340,6 +334,57 @@ if obj is not None:
 """,
         "difficulty": "beginner"
     },
+    {
+        "regex": r"RecursionError: maximum recursion depth exceeded",
+        "title": "Maximum Recursion Depth Exceeded",
+        "explanation": "Your code contains a function that is calling itself too many times. This usually happens when a recursive function doesn't have a proper exit condition, creating an infinite loop of function calls.",
+        "solution": "Check your recursive function and make sure it has a proper base case that will eventually be reached. Also consider if the problem could be solved using iteration instead of recursion.",
+        "code_example": """
+# Incorrect (infinite recursion):
+def factorial(n):
+    return n * factorial(n-1)  # No base case!
+
+# Correct:
+def factorial(n):
+    if n <= 1:  # Base case
+        return 1
+    return n * factorial(n-1)
+""",
+        "related_errors": ["StackOverflowError"],
+        "difficulty": "intermediate",
+    },
+    {
+        "regex": r"ModuleNotFoundError: No module named '([^']+)'",
+        "title": "Module Not Found: {{$1}}",
+        "explanation": "Python couldn't find the module '{{$1}}' that your code is trying to import. This could be because the module isn't installed, or there's a typo in the module name.",
+        "solution": "Make sure the module '{{$1}}' is installed. You can install it using pip: 'pip install {{$1}}'. Also check for typos in the import statement.",
+        "code_example": """
+# Installation command:
+# pip install {{$1}}
+
+# Then import it:
+import {{$1}}
+""",
+        "related_errors": ["ImportError"],
+        "difficulty": "beginner",
+    },
+    {
+        "regex": r"KeyboardInterrupt",
+        "title": "Keyboard Interrupt",
+        "explanation": "This isn't actually an error, but a signal that the program was deliberately interrupted by the user (usually by pressing Ctrl+C).",
+        "solution": "If you intended to stop the program, no action is needed. If this was accidental, simply run the program again. If you want your program to handle interruptions gracefully, you can catch KeyboardInterrupt exceptions.",
+        "code_example": """
+try:
+    # Your long-running code here
+    while True:
+        process_data()
+except KeyboardInterrupt:
+    print("Program was interrupted by user")
+    # Clean up resources here
+    save_progress()
+""",
+        "difficulty": "beginner",
+    },
 ]
 
 # JavaScript error patterns
@@ -410,83 +455,71 @@ document.getElementById("button").addEventListener("click", function() {
     {
         "regex": r"Uncaught RangeError: Maximum call stack size exceeded",
         "title": "Maximum Call Stack Size Exceeded",
-        "explanation": "Your code has caused the JavaScript call stack to overflow, typically due to infinite recursion - a function that keeps calling itself without a proper base case to stop the recursion.",
-        "solution": "Ensure recursive functions have a proper termination condition. For deeply nested operations, consider rewriting using iteration or asynchronous methods.",
+        "explanation": "This error occurs when too many function calls are placed on the call stack. It's typically caused by infinite recursion (a function calling itself without a proper exit condition).",
+        "solution": "Check for recursive functions and ensure they have a proper termination condition. Look for circular function calls where A calls B, B calls C, and C calls A again. Consider using iteration instead of recursion when appropriate.",
         "code_example": """
-// Problematic code - infinite recursion
-function causeStackOverflow() {
-  return causeStackOverflow();  // No base case!
+// Incorrect (infinite recursion):
+function countDown(n) {
+  console.log(n);
+  countDown(n - 1); // No stopping condition!
 }
 
-// Correct recursive function with base case
-function factorial(n) {
-  if (n <= 1) {  // Base case
-    return 1;
+// Correct:
+function countDown(n) {
+  console.log(n);
+  if (n > 0) { // Base case
+    countDown(n - 1);
   }
-  return n * factorial(n - 1);
-}
-
-// Alternative iterative approach
-function factorialIterative(n) {
-  let result = 1;
-  for (let i = 1; i <= n; i++) {
-    result *= i;
-  }
-  return result;
 }
 """,
-        "difficulty": "advanced",
-    },
-    {
-        "regex": r"Uncaught TypeError: ([\w\.]+) is not a function",
-        "title": "{{$1}} Is Not a Function",
-        "explanation": "Your code is trying to call {{$1}} as a function, but it's not a function. This often happens when a variable containing a different type (like string, number, or object) is accidentally used as a function.",
-        "solution": "Check the value of {{$1}} before trying to call it. Make sure it's actually a function. Verify correct spelling of function names and check if the containing object is correctly initialized.",
-        "code_example": """
-// Problematic code
-const data = { value: 42 };
-data.getValue();  // TypeError: data.getValue is not a function
-
-// Correct approaches:
-// 1. Check if it's a function first
-if (typeof data.getValue === 'function') {
-  data.getValue();
-} else {
-  console.log("getValue is not available as a function");
-}
-
-// 2. Define the function if needed
-const data = { 
-  value: 42,
-  getValue: function() {
-    return this.value;
-  }
-};
-data.getValue();  // Now it works
-""",
+        "related_errors": ["RecursionError", "StackOverflowError"],
         "difficulty": "intermediate",
     },
     {
-        "regex": r"Uncaught TypeError: ([^\']+) is (null|undefined)",
-        "title": "{{$1}} is {{$2}}",
-        "explanation": "You're trying to use a variable \"{{$1}}\" that has the value {{$2}}. This means the variable doesn't have a usable value.",
-        "solution": "Make sure \"{{$1}}\" has a proper value before using it. Check where it's defined and ensure it's assigned a valid value.",
+        "regex": r"Uncaught TypeError: Cannot read propert(?:y|ies) '([^']+)' of (null|undefined)",
+        "title": "Cannot Read Property '{{$1}}' of {{$2}}",
+        "explanation": "You're trying to access the property '{{$1}}' on a value that is {{$2}}. This means you're trying to use an object that doesn't exist or hasn't been initialized yet.",
+        "solution": "Make sure the object exists before trying to access its properties. Add a check to verify the object is not {{$2}} before accessing it.",
         "code_example": """
 // Incorrect:
-let element = document.getElementById('non-existent-id');
-element.innerHTML = 'Hello'; // Error: element is null
+const user = null;
+console.log(user.name); // Error: Cannot read property 'name' of null
 
 // Correct:
-let element = document.getElementById('non-existent-id');
-if (element) {
-  element.innerHTML = 'Hello';
+const user = null;
+if (user) {
+  console.log(user.name);
 } else {
-  console.log('Element not found');
+  console.log('User not available');
 }
+
+// Modern approach with optional chaining:
+console.log(user?.name); // Safely outputs undefined instead of crashing
 """,
+        "related_errors": ["TypeError"],
+        "difficulty": "beginner",
     },
     {
-        "regex": r"TypeError: Cannot set propert(?:y|ies) \'([^\']+)\' of (null|undefined)",
+        "regex": r"Uncaught SyntaxError: Unexpected token '([^']+)'",
+        "title": "Syntax Error: Unexpected Token '{{$1}}'",
+        "explanation": "JavaScript encountered a character '{{$1}}' that it didn't expect at that position. This is often due to missing or mismatched brackets, parentheses, or quotes.",
+        "solution": "Check for unbalanced brackets, parentheses, or quotes. Look for missing semicolons or commas. Use a code editor with syntax highlighting to help spot these issues.",
+        "code_example": """
+// Examples of syntax errors:
+// Missing closing parenthesis
+if (x === 5 {  // Should be: if (x === 5) {
+  doSomething();
+}
+
+// Unmatched quotes
+const name = 'John;  // Should be: const name = 'John';
+
+// Fix by ensuring all syntax elements are properly matched and closed
+""",
+        "difficulty": "beginner",
+    },
+    {
+        "regex": r"Uncaught TypeError: Cannot set propert(?:y|ies) \'([^\']+)\' of (null|undefined)",
         "title": 'Cannot Set Property "{{$1}}" of {{$2}}',
         "explanation": "You're trying to set the property \"{{$1}}\" on a {{$2}} value. This happens when you try to modify properties on variables that don't have any value.",
         "solution": "Make sure the object exists and is not {{$2}} before trying to set its properties. Check that the object has been properly initialized.",
@@ -1126,99 +1159,129 @@ int number = Integer.parseInt(numberStr); // Convert String to int correctly
 """
     },
     {
-        "regex": r"java.lang.NullPointerException(?:\s*:\s*(.*))?",
-        "title": "Java Null Pointer Exception",
-        "explanation": "This occurs when your program tries to use an object reference that has a null value. You're trying to access a method or property of an object that doesn't exist in memory.",
-        "solution": "Always check if objects are null before using them. Find where the null value is coming from and initialize the object properly before using it.",
+        "regex": r"java\.lang\.NullPointerException: Cannot (invoke|read|call|perform) \"([^\"]+)\" because \"([^\"]+)\" is null",
+        "title": "Null Pointer Exception",
+        "explanation": "You're trying to {{$1}} '{{$2}}' on '{{$3}}', but '{{$3}}' is null. This happens when you try to use a method or access a property on an object that doesn't exist.",
+        "solution": "Always check if an object is null before using it. Initialize objects properly or provide default values/behaviors for null cases.",
         "difficulty": "beginner",
         "code_example": """
-// Example fix for NullPointerException
-if (myObject != null) {
-    myObject.doSomething(); // Only call method if object exists
-}
-"""
-    },
-    {
-        "regex": r"illegal start of expression",
-        "title": "Java Syntax Error: Illegal Start of Expression",
-        "explanation": "Java encountered code it couldn't parse because the syntax is incorrect. This often happens due to mismatched brackets, missing semicolons, or writing code in an invalid location.",
-        "solution": "Check for missing closing brackets (}, ), or ]). Verify that all statements end with semicolons. Make sure you're not placing code outside of methods or blocks where it doesn't belong.",
-        "difficulty": "beginner"
-    },
-    {
-        "regex": r"java.lang.ArrayIndexOutOfBoundsException: (\d+)",
-        "title": "Java Array Index Out of Bounds Exception",
-        "explanation": "You're trying to access an array element at index {{$1}}, but this index doesn't exist in the array. Arrays in Java are zero-indexed, meaning the first element is at index 0.",
-        "solution": "Check your array bounds and make sure you're not trying to access elements that don't exist. Verify your loop conditions when iterating through arrays.",
-        "difficulty": "beginner",
-        "code_example": """
-// Example fix for ArrayIndexOutOfBoundsException
-int[] array = new int[5]; // Array with indices 0-4
-for (int i = 0; i < array.length; i++) { // Use array.length, not a hardcoded value
-    array[i] = i; // This is safe
-}
-"""
-    },
-    {
-        "regex": r"class, interface, or enum expected",
-        "title": "Java Syntax Error: Class, Interface, or Enum Expected",
-        "explanation": "The Java compiler expected to find a class, interface, or enum declaration but found something else. This typically happens when you have mismatched braces in your code.",
-        "solution": "Check for missing or mismatched curly braces {}. Make sure each opening brace has a corresponding closing brace. Verify that all classes, methods, and blocks are properly closed.",
-        "difficulty": "beginner"
-    },
-    {
-        "regex": r"unreported exception (.*); must be caught or declared to be thrown",
-        "title": "Java Uncaught Exception Error",
-        "explanation": "Your code is generating a checked exception ({{$1}}) that isn't being handled. In Java, checked exceptions must either be caught in a try-catch block or declared in the method signature with a throws clause.",
-        "solution": "Either wrap the code in a try-catch block to handle the exception, or add a 'throws' clause to the method declaration to pass the exception up the call stack.",
-        "difficulty": "intermediate",
-        "code_example": """
-// Option 1: Handle with try-catch
-try {
-    riskyOperation(); // Method that might throw an exception
-} catch (IOException e) {
-    System.out.println("Error: " + e.getMessage());
+// Incorrect:
+String name = null;
+System.out.println(name.length()); // Error: NullPointerException
+
+// Correct:
+String name = null;
+if (name != null) {
+    System.out.println(name.length());
+} else {
+    System.out.println("Name is null");
 }
 
-// Option 2: Declare exception in method signature
-public void myMethod() throws IOException {
-    riskyOperation();
-}
+// Java 8+ approach with Optional:
+Optional<String> optName = Optional.ofNullable(name);
+optName.ifPresent(n -> System.out.println(n.length()));
 """
     },
     {
-        "regex": r"variable (.*) might not have been initialized",
-        "title": "Java Uninitialized Variable Error",
-        "explanation": "You're trying to use the local variable {{$1}} before it has been initialized with a value. Java requires all local variables to be assigned values before they are used.",
-        "solution": "Initialize the variable with a value when you declare it, or make sure it's assigned a value in all possible code paths before it's used.",
+        "regex": r"java\.lang\.ArrayIndexOutOfBoundsException: Index (\d+) out of bounds for length (\d+)",
+        "title": "Array Index Out of Bounds",
+        "explanation": "You're trying to access index {{$1}} in an array that only has {{$2}} elements (indexes 0 to {{$2-1}}). Array indexes in Java start at 0, not 1.",
+        "solution": "Check your array access logic. Make sure loop conditions don't exceed array bounds. Use array.length to determine the size of the array rather than hardcoding values.",
         "difficulty": "beginner",
         "code_example": """
-// Correct initialization of local variables
-int number = 0; // Initialize with default value
-String text = ""; // Initialize with empty string
-Object obj = null; // Initialize with null
-"""
-    },
-    {
-        "regex": r"java.lang.ClassCastException: (.*) cannot be cast to (.*)",
-        "title": "Java Class Cast Exception",
-        "explanation": "You're trying to cast an object of type {{$1}} to type {{$2}}, but this cast is not valid. The object is not an instance of the target class or any of its subclasses.",
-        "solution": "Check that the object is actually of the type you're trying to cast it to. Use the 'instanceof' operator to verify an object's type before casting it.",
-        "difficulty": "intermediate",
-        "code_example": """
-// Safe casting with instanceof check
-if (myObject instanceof TargetClass) {
-    TargetClass typedObject = (TargetClass) myObject; // Safe cast
-    typedObject.doSomething();
+// Incorrect:
+int[] numbers = new int[5]; // Has indexes 0-4
+System.out.println(numbers[5]); // Error: Index 5 is out of bounds
+
+// Correct:
+int[] numbers = new int[5];
+for (int i = 0; i < numbers.length; i++) {
+    // Safe access within bounds
+    numbers[i] = i;
 }
 """
     },
     {
-        "regex": r"method (.*) in class (.*) cannot be applied to given types",
-        "title": "Java Method Invocation Error",
-        "explanation": "You're calling the method {{$1}} from class {{$2}} with incorrect parameter types. The method exists, but the arguments you're providing don't match any available method signature.",
-        "solution": "Check the documentation or declaration of the method to see which parameter types it expects. Adjust your method call to provide compatible arguments.",
-        "difficulty": "intermediate"
+        "regex": r"java\.lang\.ClassCastException: ([^\s]+) cannot be cast to ([^\s]+)",
+        "title": "Invalid Class Cast",
+        "explanation": "You're trying to cast an object of type {{$1}} to type {{$2}}, but these types are not compatible for casting. An object can only be cast to its own type or a supertype/interface it implements.",
+        "solution": "Check your object types and make sure you're only casting to compatible types. Use 'instanceof' to verify the object's type before casting.",
+        "difficulty": "intermediate", 
+        "code_example": """
+// Incorrect:
+Object obj = "Hello";
+Integer num = (Integer) obj; // Error: String cannot be cast to Integer
+
+// Correct:
+Object obj = "Hello";
+if (obj instanceof String) {
+    String str = (String) obj; // Safe cast
+    System.out.println(str);
+} else if (obj instanceof Integer) {
+    Integer num = (Integer) obj;
+    System.out.println(num);
+}
+"""
+    },
+    {
+        "regex": r"exception in thread \"main\" java\.lang\.StackOverflowError",
+        "title": "Stack Overflow Error",
+        "explanation": "This error occurs when the Java call stack overflows due to too many method calls. This is typically caused by infinite recursion (a method that keeps calling itself without a proper stopping condition).",
+        "solution": "Ensure recursive methods have a proper base case that will stop the recursion. Consider using iteration instead of recursion for deeply nested operations.",
+        "difficulty": "intermediate",
+        "code_example": """
+// Incorrect (infinite recursion):
+public int factorial(int n) {
+    return n * factorial(n - 1); // No base case!
+}
+
+// Correct:
+public int factorial(int n) {
+    if (n <= 1) { // Base case
+        return 1;
+    }
+    return n * factorial(n - 1);
+}
+
+// Alternative iterative approach:
+public int factorial(int n) {
+    int result = 1;
+    for (int i = 1; i <= n; i++) {
+        result *= i;
+    }
+    return result;
+}
+"""
+    },
+    {
+        "regex": r"java\.lang\.NumberFormatException: For input string: \"([^\"]+)\"",
+        "title": "Number Format Exception",
+        "explanation": "Java couldn't convert the string \"{{$1}}\" to a number. This happens when you try to parse a string that doesn't represent a valid number.",
+        "solution": "Make sure the string contains only valid numerical characters for the number type you're trying to parse. Add validation before attempting to parse strings to numbers.",
+        "difficulty": "beginner",
+        "code_example": """
+// Incorrect:
+String notANumber = "abc123";
+int number = Integer.parseInt(notANumber); // Error: NumberFormatException
+
+// Correct with validation:
+String input = "abc123";
+try {
+    int number = Integer.parseInt(input);
+    System.out.println("Number: " + number);
+} catch (NumberFormatException e) {
+    System.out.println("Invalid number format: " + input);
+}
+
+// Or check if it's a valid number first:
+String input = "abc123";
+if (input.matches("\\d+")) {
+    int number = Integer.parseInt(input);
+    System.out.println("Number: " + number);
+} else {
+    System.out.println("Not a valid number");
+}
+"""
     }
 ]
 
@@ -1370,21 +1433,28 @@ end
         "regex": r"ZeroDivisionError: divided by 0",
         "title": "Ruby Division by Zero Error",
         "explanation": "This error occurs when you try to divide a number by zero, which is mathematically undefined.",
-        "solution": "Add a check to prevent division by zero. Make sure divisors are never zero before performing division operations.",
+        "solution": "Add a check to prevent division by zero. Validate denominators before performing division operations.",
         "difficulty": "beginner",
         "code_example": """
-# Safe division with zero check
-def safe_divide(a, b)
-  if b.zero?
-    puts "Cannot divide by zero!"
-    return nil
-  else
-    return a / b
-  end
+# Incorrect:
+result = 10 / 0  # Error: divided by 0
+
+# Correct:
+denominator = 0
+if denominator != 0
+  result = 10 / denominator
+else
+  puts "Cannot divide by zero"
+  result = nil  # or some default value
 end
 
-# Or with a ternary operator
-result = divisor.zero? ? nil : number / divisor
+# Alternative with exception handling:
+begin
+  result = 10 / denominator
+rescue ZeroDivisionError
+  puts "Cannot divide by zero"
+  result = nil
+end
 """
     },
     {
@@ -1424,7 +1494,26 @@ rescue => e
   # Provide fallback or recovery code
 end
 """
-    }
+    },
+    {
+        "regex": r"NoMethodError: undefined method `([^']+)' for ([^:]+):([^:]+)",
+        "title": "Undefined Method '{{$1}}' for {{$2}}",
+        "explanation": "You're trying to call a method named '{{$1}}' on an object of type {{$3}}, but that method doesn't exist for this type of object.",
+        "solution": "Make sure you're calling the correct method for this object type. Check the documentation to see what methods are available. Check for typos in method names.",
+        "difficulty": "beginner",
+        "code_example": """
+# Incorrect:
+number = 42
+number.each { |n| puts n }  # Error: undefined method 'each' for Integer
+
+# Correct:
+number = 42
+puts number  # Just print the number directly
+
+# Or if you meant to iterate over a range:
+(1..number).each { |n| puts n }  # Works on a Range object
+"""
+    },
 ]
 
 # Update ERROR_PATTERNS dictionary to include Ruby
