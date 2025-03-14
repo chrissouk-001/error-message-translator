@@ -26,6 +26,17 @@ The Error Message Translator provides a clean, intuitive interface for translati
 - Includes code examples showing how to fix common errors
 - Automatic language detection
 
+## TODO
+
+- [ ] Add support for more programming languages (C++, PHP, Swift)
+- [ ] Implement error pattern suggestions based on user history
+- [ ] Add a browser extension for quick error translation
+- [ ] Create a mobile app version
+- [ ] Add unit tests for new error patterns
+- [ ] Implement error pattern validation
+- [ ] Add support for custom error pattern submissions
+- [ ] Create a community-driven error pattern database
+
 ## Project Structure
 
 ```
