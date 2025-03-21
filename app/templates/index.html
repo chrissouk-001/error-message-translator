@@ -23,100 +23,151 @@
     </script>
 </head>
 <body>
-    <!-- Debugging script -->
+    <!-- Debugging script - Only active in development mode -->
     <script>
-        // Override console.log to make it more visible
-        const originalConsoleLog = console.log;
-        console.log = function() {
-            // Call original console.log
-            originalConsoleLog.apply(console, arguments);
-            
-            // Create a log element to display in the page
-            const logContainer = document.getElementById('debug-logs');
-            if (logContainer) {
-                const logEntry = document.createElement('div');
-                logEntry.className = 'debug-log';
-                
-                // Convert all arguments to strings
-                const logMessage = Array.prototype.slice.call(arguments)
-                    .map(arg => {
-                        if (typeof arg === 'object') {
-                            try {
-                                return JSON.stringify(arg);
-                            } catch (e) {
-                                return String(arg);
-                            }
-                        }
-                        return String(arg);
-                    })
-                    .join(' ');
-                
-                logEntry.textContent = logMessage;
-                logContainer.appendChild(logEntry);
-                
-                // Scroll to bottom
-                logContainer.scrollTop = logContainer.scrollHeight;
-            }
-        };
+        // Only enable debugging in development environments
+        // In production, this should be controlled by a server-side flag
+        const isDevEnvironment = window.location.hostname === 'localhost' || 
+                               window.location.hostname === '127.0.0.1';
         
-        // Also override console.error for better visibility
-        const originalConsoleError = console.error;
-        console.error = function() {
-            // Call original console.error
-            originalConsoleError.apply(console, arguments);
-            
-            // Create a log element to display in the page
-            const logContainer = document.getElementById('debug-logs');
-            if (logContainer) {
-                const logEntry = document.createElement('div');
-                logEntry.className = 'debug-log error';
+        if (isDevEnvironment) {
+            // Override console.log to make it more visible
+            const originalConsoleLog = console.log;
+            console.log = function() {
+                // Call original console.log
+                originalConsoleLog.apply(console, arguments);
                 
-                // Convert all arguments to strings
-                const logMessage = Array.prototype.slice.call(arguments)
-                    .map(arg => {
-                        if (typeof arg === 'object') {
-                            try {
-                                return JSON.stringify(arg);
-                            } catch (e) {
-                                return String(arg);
+                // Create a log element to display in the page
+                const logContainer = document.getElementById('debug-logs');
+                if (logContainer) {
+                    const logEntry = document.createElement('div');
+                    logEntry.className = 'debug-log';
+                    
+                    // Convert all arguments to strings, with sanitization
+                    const logMessage = Array.prototype.slice.call(arguments)
+                        .map(arg => {
+                            let result = '';
+                            if (typeof arg === 'object') {
+                                try {
+                                    // Limit size of objects being stringified to prevent DoS
+                                    const stringify = (obj) => {
+                                        const seen = new WeakSet();
+                                        return JSON.stringify(obj, (key, value) => {
+                                            if (typeof value === 'object' && value !== null) {
+                                                if (seen.has(value)) return '[Circular]';
+                                                seen.add(value);
+                                            }
+                                            return value;
+                                        }, 2);
+                                    };
+                                    result = stringify(arg);
+                                    if (result.length > 5000) result = result.substring(0, 5000) + '... [truncated]';
+                                } catch (e) {
+                                    result = String(arg);
+                                }
+                            } else {
+                                result = String(arg);
+                                if (result.length > 5000) result = result.substring(0, 5000) + '... [truncated]';
                             }
-                        }
-                        return String(arg);
-                    })
-                    .join(' ');
-                
-                logEntry.textContent = logMessage;
-                logContainer.appendChild(logEntry);
-                
-                // Scroll to bottom
-                logContainer.scrollTop = logContainer.scrollHeight;
-            }
-        };
-        
-        // Add a debug log container
-        document.addEventListener('DOMContentLoaded', function() {
-            const debugContainer = document.createElement('div');
-            debugContainer.id = 'debug-logs';
-            debugContainer.className = 'debug-container';
-            debugContainer.style.cssText = 'position: fixed; bottom: 0; right: 0; width: 400px; height: 200px; overflow: auto; background: rgba(0,0,0,0.8); color: white; font-family: monospace; font-size: 10px; padding: 10px; z-index: 9999; display: none;';
-            document.body.appendChild(debugContainer);
-            
-            // Add toggle button
-            const toggleButton = document.createElement('button');
-            toggleButton.textContent = 'Show Debug';
-            toggleButton.style.cssText = 'position: fixed; bottom: 0; right: 0; z-index: 10000; font-size: 10px; padding: 2px 5px; background: #333; color: white; border: none;';
-            toggleButton.addEventListener('click', function() {
-                const logs = document.getElementById('debug-logs');
-                if (logs.style.display === 'none') {
-                    logs.style.display = 'block';
-                    this.textContent = 'Hide Debug';
-                } else {
-                    logs.style.display = 'none';
-                    this.textContent = 'Show Debug';
+                            return result;
+                        })
+                        .join(' ');
+                    
+                    // Use textContent (not innerHTML) to prevent XSS
+                    logEntry.textContent = logMessage;
+                    logContainer.appendChild(logEntry);
+                    
+                    // Scroll to bottom
+                    logContainer.scrollTop = logContainer.scrollHeight;
+                    
+                    // Limit number of log entries to prevent memory issues
+                    while (logContainer.children.length > 100) {
+                        logContainer.removeChild(logContainer.firstChild);
+                    }
                 }
+            };
+            
+            // Also override console.error for better visibility
+            const originalConsoleError = console.error;
+            console.error = function() {
+                // Call original console.error
+                originalConsoleError.apply(console, arguments);
+                
+                // Create a log element to display in the page
+                const logContainer = document.getElementById('debug-logs');
+                if (logContainer) {
+                    const logEntry = document.createElement('div');
+                    logEntry.className = 'debug-log error';
+                    
+                    // Convert all arguments to strings, with sanitization
+                    const logMessage = Array.prototype.slice.call(arguments)
+                        .map(arg => {
+                            let result = '';
+                            if (typeof arg === 'object') {
+                                try {
+                                    // Limit size of objects being stringified to prevent DoS
+                                    const stringify = (obj) => {
+                                        const seen = new WeakSet();
+                                        return JSON.stringify(obj, (key, value) => {
+                                            if (typeof value === 'object' && value !== null) {
+                                                if (seen.has(value)) return '[Circular]';
+                                                seen.add(value);
+                                            }
+                                            return value;
+                                        }, 2);
+                                    };
+                                    result = stringify(arg);
+                                    if (result.length > 5000) result = result.substring(0, 5000) + '... [truncated]';
+                                } catch (e) {
+                                    result = String(arg);
+                                }
+                            } else {
+                                result = String(arg);
+                                if (result.length > 5000) result = result.substring(0, 5000) + '... [truncated]';
+                            }
+                            return result;
+                        })
+                        .join(' ');
+                    
+                    // Use textContent (not innerHTML) to prevent XSS
+                    logEntry.textContent = logMessage;
+                    logContainer.appendChild(logEntry);
+                    
+                    // Scroll to bottom
+                    logContainer.scrollTop = logContainer.scrollHeight;
+                    
+                    // Limit number of log entries to prevent memory issues
+                    while (logContainer.children.length > 100) {
+                        logContainer.removeChild(logContainer.firstChild);
+                    }
+                }
+            };
+            
+            // Add a debug log container
+            document.addEventListener('DOMContentLoaded', function() {
+                const debugContainer = document.createElement('div');
+                debugContainer.id = 'debug-logs';
+                debugContainer.className = 'debug-container';
+                debugContainer.style.cssText = 'position: fixed; bottom: 0; right: 0; width: 400px; height: 200px; overflow: auto; background: rgba(0,0,0,0.8); color: white; font-family: monospace; font-size: 10px; padding: 10px; z-index: 9999; display: none;';
+                document.body.appendChild(debugContainer);
+                
+                // Add toggle button
+                const toggleButton = document.createElement('button');
+                toggleButton.textContent = 'Show Debug';
+                toggleButton.style.cssText = 'position: fixed; bottom: 0; right: 0; z-index: 10000; font-size: 10px; padding: 2px 5px; background: #333; color: white; border: none;';
+                toggleButton.addEventListener('click', function() {
+                    const logs = document.getElementById('debug-logs');
+                    if (logs.style.display === 'none') {
+                        logs.style.display = 'block';
+                        this.textContent = 'Hide Debug';
+                    } else {
+                        logs.style.display = 'none';
+                        this.textContent = 'Show Debug';
+                    }
+                });
+                document.body.appendChild(toggleButton);
             });
-            document.body.appendChild(toggleButton);
-        });
+        }
     </script>
     
     <!-- Accessibility announcer for screen readers -->
