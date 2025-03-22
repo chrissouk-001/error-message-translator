@@ -31,21 +31,47 @@ def main():
     
     # Determine if we're running in debug mode
     # In production mode, override any debug flags for security
-    debug_mode = False if args.prod else (args.debug or 'FLASK_DEBUG' in os.environ)
+    debug_mode = False if args.prod else (args.debug or os.environ.get('FLASK_DEBUG', 'False').lower() == 'true')
     
     # In production, only bind to loopback unless explicitly specified
     host = args.host
     
     # Configure production settings
     if args.prod:
-        host = os.environ.get('HOST', '127.0.0.1')  # Default to loopback in production
+        # Default to loopback in production for security
+        host = os.environ.get('HOST', '127.0.0.1')
+        
         # Ensure we're not exposing debug features
         os.environ['FLASK_DEBUG'] = 'False'
         app.config['DEBUG'] = False
+        
+        # Ensure secure cookie settings
+        app.config['SESSION_COOKIE_SECURE'] = True
+        app.config['SESSION_COOKIE_HTTPONLY'] = True
+        app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+        
+        # Disable JSON key sorting to prevent potential information leakage
+        app.config['JSON_SORT_KEYS'] = False
+        
+        # Add additional security headers in production
+        os.environ['ENABLE_STRICT_TRANSPORT_SECURITY'] = 'True'
+        
         print("Running in production mode with secure settings")
+    elif debug_mode:
+        print("WARNING: Running in debug mode. Not recommended for production!")
+        if host == '0.0.0.0':
+            print("SECURITY WARNING: Debug mode is enabled and the server is accessible from all interfaces")
+            print("Consider using 127.0.0.1 instead for local development")
+    
+    # Apply maximum request size limits to prevent DOS attacks
+    app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024  # 1 MB limit
     
     # Start the Flask application with appropriate settings
-    app.run(debug=debug_mode, host=host, port=args.port)
+    # In production mode, use a production-ready WSGI server instead of Flask's built-in server
+    if args.prod:
+        print("NOTE: For actual production deployment, use a production WSGI server like Gunicorn or uWSGI")
+    
+    app.run(debug=debug_mode, host=host, port=args.port, threaded=True)
 
 
 # Entry point check to run the application

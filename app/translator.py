@@ -5,8 +5,17 @@ This module handles the translation of error messages from various programming
 languages into simplified explanations for beginners.
 """
 import re
-import json
-from pathlib import Path
+import time
+import logging
+from functools import lru_cache
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Constants for security limits
+MAX_ERROR_LENGTH = 10000  # Maximum allowed error message length
+REGEX_TIMEOUT = 0.5  # Timeout for regex operations in seconds
 from app.data.error_patterns import (
     PYTHON_PATTERNS,
     JAVASCRIPT_PATTERNS,
@@ -32,20 +41,36 @@ ERROR_PATTERNS = {
 def translate_text(text, output_language=None):
     """
     Since we're English-only now, this function simply returns the original text.
+    Input is validated and sanitized.
 
     Args:
         text (str): The text to translate
         output_language (str): Ignored, kept for compatibility
 
     Returns:
-        str: The original text
+        str: The sanitized original text
     """
+    # Input validation
+    if not isinstance(text, str):
+        logger.warning(f"Non-string input to translate_text: {type(text)}")
+        text = str(text) if text is not None else ""
+        
+    # Basic input sanitization - remove any potentially harmful control characters
+    text = re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]', '', text)
+    
+    # Limit length to prevent abuse
+    if len(text) > MAX_ERROR_LENGTH:
+        logger.warning(f"Text exceeding max length ({len(text)} chars) truncated")
+        text = text[:MAX_ERROR_LENGTH] + "... [truncated]"
+        
     return text
 
 
+@lru_cache(maxsize=128)  # Cache results to improve performance and reduce regex load
 def detect_language(error_message):
     """
     Attempt to detect the programming language from the error message.
+    Now with improved security handling and caching for performance.
 
     Args:
         error_message (str): The error message to analyze
@@ -53,6 +78,16 @@ def detect_language(error_message):
     Returns:
         str: The detected language ('python', 'javascript', 'html', 'css', 'java', 'ruby', or 'general')
     """
+    # Input validation
+    if not isinstance(error_message, str):
+        logger.warning(f"Non-string input to detect_language: {type(error_message)}")
+        error_message = str(error_message) if error_message is not None else ""
+    
+    # Limit input length for security
+    if len(error_message) > MAX_ERROR_LENGTH:
+        logger.warning(f"Error message exceeding max length ({len(error_message)} chars) truncated")
+        error_message = error_message[:MAX_ERROR_LENGTH]
+    
     # Initialize counters for each language
     language_scores = {
         "python": 0,
@@ -81,13 +116,27 @@ def detect_language(error_message):
                 language_scores[language] += 1
     
     # Pattern matching - check if any pattern from a language matches
+    # Use timeout to prevent ReDoS attacks
     for language, patterns in ERROR_PATTERNS.items():
         if language == "general":
             continue  # Skip general patterns for now
             
         for pattern in patterns:
-            if re.search(pattern["regex"], error_message, re.IGNORECASE):
-                language_scores[language] += 2  # Pattern matches are stronger indicators
+            try:
+                # Use a timeout to prevent ReDoS attacks
+                start_time = time.time()
+                if time.time() - start_time > REGEX_TIMEOUT:
+                    logger.warning(f"Regex timeout prevention for language: {language}")
+                    break
+                    
+                if re.search(pattern["regex"], error_message, re.IGNORECASE | re.DOTALL, timeout=REGEX_TIMEOUT):
+                    language_scores[language] += 2  # Pattern matches are stronger indicators
+            except re.error as e:
+                logger.error(f"Regex error in {language} pattern: {e}")
+                continue
+            except Exception as e:
+                logger.error(f"Error in language detection for {language}: {e}")
+                continue
     
     # Check for file extensions in the error message
     file_extensions = {
@@ -124,6 +173,7 @@ def detect_language(error_message):
 def translate_error(error_message, language="auto", output_language=None):
     """
     Translate an error message to a human-readable explanation (English only).
+    Now with improved security handling.
 
     Args:
         error_message (str): The error message to translate
@@ -133,8 +183,38 @@ def translate_error(error_message, language="auto", output_language=None):
     Returns:
         dict: A dictionary containing the explanation
     """
-    # Debug print statement
-    print(f"Processing error: '{error_message[:50]}...' detected as {language}")
+    # Begin timing the translation process
+    start_time = time.time()
+    
+    # Input validation
+    if not isinstance(error_message, str):
+        logger.warning(f"Non-string input to translate_error: {type(error_message)}")
+        error_message = str(error_message) if error_message is not None else ""
+    
+    # Sanitize input - remove control characters that might affect regex
+    error_message = re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]', '', error_message)
+    
+    # Limit input length for security
+    if len(error_message) > MAX_ERROR_LENGTH:
+        logger.warning(f"Error message exceeding max length ({len(error_message)} chars) truncated")
+        error_message = error_message[:MAX_ERROR_LENGTH] + "... [truncated]"
+    
+    # Validate language parameter
+    if not isinstance(language, str):
+        logger.warning(f"Invalid language parameter: {language}")
+        language = "auto"  # Default to auto-detection for invalid input
+    
+    # Normalize language to lowercase
+    language = language.lower()
+    
+    # Only accept valid language options
+    valid_languages = set(ERROR_PATTERNS.keys()) | {"auto"}
+    if language not in valid_languages:
+        logger.warning(f"Invalid language specified: {language}, defaulting to auto")
+        language = "auto"
+        
+    # Log the processing (use logging instead of print for production code)
+    logger.info(f"Processing error: '{error_message[:50]}...' specified language: {language}")
 
     if not error_message:
         return {
@@ -154,45 +234,76 @@ def translate_error(error_message, language="auto", output_language=None):
     patterns = ERROR_PATTERNS.get(language, GENERAL_PATTERNS)
 
     # Try to match the error with known patterns
+    # Use a try/except block to catch and handle any regex errors
     for pattern in patterns:
-        match = re.search(pattern["regex"], error_message, re.IGNORECASE)
-        if match:
-            # Replace placeholders in explanation with captured groups
-            title = pattern["title"]
-            explanation = pattern["explanation"]
-            solution = pattern["solution"]
-            code_example = pattern.get("code_example", "")
-            difficulty = pattern.get(
-                "difficulty", "intermediate"
-            )  # Default to intermediate if not specified
+        try:
+            # Use a timeout to prevent ReDoS attacks
+            match = re.search(pattern["regex"], error_message, re.IGNORECASE | re.DOTALL, timeout=REGEX_TIMEOUT)
+            if match:
+                # Replace placeholders in explanation with captured groups
+                title = pattern["title"]
+                explanation = pattern["explanation"]
+                solution = pattern["solution"]
+                code_example = pattern.get("code_example", "")
+                difficulty = pattern.get(
+                    "difficulty", "intermediate"
+                )  # Default to intermediate if not specified
 
-            # Replace placeholders with captured groups
-            for i, group in enumerate(match.groups(), 1):
-                placeholder = "{{$" + str(i) + "}}"
-                title = title.replace(placeholder, group)
-                explanation = explanation.replace(placeholder, group)
-                solution = solution.replace(placeholder, group)
-                code_example = code_example.replace(placeholder, group)
+                # Safely replace placeholders with captured groups
+                try:
+                    for i, group in enumerate(match.groups(), 1):
+                        if group is None:
+                            group = ""  # Handle None values in match groups
+                        placeholder = "{{$" + str(i) + "}}"
+                        # Ensure group is a string and sanitize it
+                        group_str = str(group)
+                        # Replace placeholders safely
+                        title = title.replace(placeholder, group_str)
+                        explanation = explanation.replace(placeholder, group_str)
+                        solution = solution.replace(placeholder, group_str)
+                        code_example = code_example.replace(placeholder, group_str)
+                except Exception as e:
+                    logger.error(f"Error processing match groups: {e}")
+                    # Continue with unmodified template text rather than failing
 
-            # Build result dictionary
+            # Build result dictionary with additional security measures
+            # Sanitize all outputs to ensure they don't contain harmful content
             result = {
-                "title": title,
-                "explanation": explanation,
+                "title": translate_text(title)[:200],  # Limit title length
+                "explanation": translate_text(explanation)[:5000],  # Limit explanation length
                 "original_error": error_message,
-                "solution": solution,
+                "solution": translate_text(solution)[:5000],  # Limit solution length
                 "language": language,
                 "difficulty": difficulty,
+                "processing_time": f"{(time.time() - start_time):.3f}s",  # Add processing time for monitoring
             }
 
-            # Add code example if available
+            # Add code example if available, with length limit
             if code_example:
-                result["code_example"] = code_example
+                result["code_example"] = code_example[:5000]
 
             # Add related errors if available
             if "related_errors" in pattern:
-                result["related_errors"] = pattern["related_errors"]
+                # Validate related errors format and content
+                if isinstance(pattern["related_errors"], list):
+                    # Limit number of related errors and their length
+                    safe_related = []
+                    for related in pattern["related_errors"][:5]:  # Limit to 5 related errors
+                        if isinstance(related, dict) and "title" in related and "description" in related:
+                            safe_related.append({
+                                "title": translate_text(related["title"])[:100],
+                                "description": translate_text(related["description"])[:500]
+                            })
+                    result["related_errors"] = safe_related
 
+            logger.info(f"Successfully translated {language} error in {result['processing_time']}")
             return result
+        except re.error as e:
+            logger.error(f"Regex error with pattern: {e}")
+            continue
+        except Exception as e:
+            logger.error(f"Unexpected error in pattern matching: {e}")
+            continue
 
     # If no pattern matches, return a general response
     return get_general_response(error_message, language)

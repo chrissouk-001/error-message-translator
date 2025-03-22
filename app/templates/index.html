@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Security meta tags -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'unsafe-inline'; style-src 'self' https://cdnjs.cloudflare.com https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data:; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Permissions-Policy" content="accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()">
+    <meta name="referrer" content="no-referrer-when-downgrade">
     <title>Error Message Translator</title>
     <meta name="description" content="Translate confusing programming error messages into simple, understandable explanations. Perfect for beginners learning Python, JavaScript, Java, Ruby, HTML, and CSS.">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
@@ -382,19 +390,81 @@
     </div>
 
     <!-- Scripts -->
-    <script>
+    <script nonce="{{request.csp_nonce if hasattr(request, 'csp_nonce') else ''}}">
+        // Add passive event listeners for better scroll performance and security
+        document.addEventListener('touchstart', function() {}, {passive: true});
+        document.addEventListener('touchmove', function() {}, {passive: true});
+        
+        // Prevent clickjacking by ensuring we're not in a frame
+        if (window.self !== window.top) {
+            window.top.location = window.self.location;
+        }
+        
+        // Basic input sanitization function
+        function sanitizeInput(input) {
+            if (typeof input !== 'string') return '';
+            return input
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/&/g, '&amp;');
+        }
         // Global error handler to detect JavaScript issues
+        // Custom error handler to avoid exposing sensitive information
         window.onerror = function(message, source, lineno, colno, error) {
+            // Log the error but don't expose full path information
+            const sanitizedSource = source ? source.replace(/^.*[\\\//]/, '') : 'unknown';
             console.error('Global error caught:', {
                 message: message,
-                source: source,
+                source: sanitizedSource,
                 lineno: lineno,
                 colno: colno,
-                error: error
+                error: error ? error.toString() : 'unknown error'
             });
-            alert('An error occurred in the application. Check the developer console for details.');
+            
+            // Don't expose specific error details to user
+            document.getElementById('toast-message').textContent = 'An error occurred in the application';
+            document.getElementById('toast').classList.add('show', 'error');
+            setTimeout(function() {
+                document.getElementById('toast').classList.remove('show', 'error');
+            }, 3000);
+            
+            // Capture but don't swallow the error
             return false;
         };
+        
+        // Add protection against XSS in innerHTML
+        Element.prototype._innerHTMLOriginal = Element.prototype.innerHTML;
+        Object.defineProperty(Element.prototype, 'innerHTML', {
+            set: function(html) {
+                // Check if this is a sensitive element that should never have HTML set
+                const sensitiveElements = ['input', 'textarea', 'select', 'button'];
+                if (sensitiveElements.includes(this.tagName.toLowerCase())) {
+                    console.error('Attempt to set innerHTML on sensitive element: ' + this.tagName);
+                    return;
+                }
+                // Allow HTML only for specific display elements
+                const allowedElements = ['div.translation-result', 'div#code-example', 'pre.code-block'];
+                let isAllowed = false;
+                for (const selector of allowedElements) {
+                    const [tag, cls] = selector.split('.');
+                    if (this.tagName.toLowerCase() === tag && (!cls || this.classList.contains(cls.replace('#', '')))) {
+                        isAllowed = true;
+                        break;
+                    }
+                }
+                if (isAllowed) {
+                    this._innerHTMLOriginal = html;
+                } else {
+                    // For all other elements, use textContent instead for security
+                    this.textContent = html;
+                }
+            },
+            get: function() {
+                return this._innerHTMLOriginal;
+            }
+        });
         
         // Fallback translateError function in case the main one fails
         window.translateErrorFallback = function() {
@@ -422,7 +492,11 @@
             // Make the API request
             fetch('/api/translate', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'  // Helps prevent CSRF
+                },
+                credentials: 'same-origin',  // Include cookies for same-origin requests
                 body: JSON.stringify({
                     error_message: errorMessage,
                     language: language,
@@ -432,6 +506,11 @@
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`Server error: ${response.status}`);
+                }
+                // Check for proper content type to prevent JSON hijacking
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error(`Invalid content type: ${contentType}`);
                 }
                 return response.json();
             })
@@ -461,12 +540,14 @@
                 const errorText = result.error || result.original_error || '';
                 const originalError = document.getElementById('original-error');
                 if (originalError) {
+                    // Use textContent to prevent XSS (not innerHTML)
                     originalError.textContent = errorText;
                 }
                 
                 // Set the explanation
                 const explanation = document.getElementById('explanation-text') || document.getElementById('explanation');
                 if (explanation) {
+                    // Use textContent to prevent XSS (not innerHTML)
                     explanation.textContent = result.explanation || 'No explanation available';
                 }
                 
@@ -503,13 +584,71 @@
             return false;
         };
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-ruby.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <!-- Add secure copyToClipboard function -->
+    <script>
+        function copyToClipboard(textId) {
+            const textElement = document.getElementById(textId);
+            if (!textElement) return false;
+            
+            // Prevent potential XSS by limiting what can be copied
+            // Only allow copying from specific, known elements
+            const allowedIds = ['original-error', 'explanation-text', 'explanation', 'solution-text', 'solution', 'code-example'];
+            if (!allowedIds.includes(textId)) {
+                console.error('Attempted to copy from unauthorized element: ' + textId);
+                showToast('Copy operation not allowed for this content', 'error');
+                return false;
+            }
+            
+            const text = textElement.innerText;
+            if (!text) return false;
+            
+            // Sanitize before copying - remove any potential script or HTML
+            const sanitizedText = text.replace(/<\/?[^>]+(>|$)/g, "");
+            
+            navigator.clipboard.writeText(sanitizedText)
+                .then(() => showToast('Text copied to clipboard!'))
+                .catch(err => {
+                    console.error('Failed to copy text: ', err);
+                    showToast('Failed to copy text', 'error');
+                });
+                
+            return false;
+        }
+        
+        // Show toast messages securely
+        function showToast(message, type = 'success') {
+            // Sanitize the message
+            const sanitizedMessage = sanitizeInput(message);
+            
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            if (toast && toastMessage) {
+                // Set message text safely using textContent
+                toastMessage.textContent = sanitizedMessage;
+                
+                // Reset classes and add appropriate ones
+                toast.className = 'toast';
+                toast.classList.add('show');
+                if (type === 'error') {
+                    toast.classList.add('error');
+                }
+                
+                // Auto-hide after 3 seconds
+                setTimeout(function() {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+        }
+    </script>
+    <!-- External scripts with integrity hashes for security -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-AU/6Iv/DHUJHkNtHXlXzqTt7YQJ5X7CqyiTLzMnCEsh1g8Bx5Yg7/SvCYFSKFSwDjFGTnCbHKMFAA0GpXXvHw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js" integrity="sha512-AKaNmg8COK0zEbjTdMHJAPJ0z6VeNqvRvH4/d5M4sHJbQQUToMBtodq4HaV4fa+WV2UTfoperOws5UUXOYKzg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js" integrity="sha512-jwrwx8NU9oDHZ0KajdGl4Qn+PW0GZJcpOsGNY3wrWuMpCil9CZSj9zckt+wi0bKuJAoxfgGOGMcmlgLJRi2fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js" integrity="sha512-ilR4Vkx44llCNwFGR4QnM99KNUIGKQaCubfTCjG3PUK9wOkhkH/NL2SMOgLzBcN7Zq/7drBLfaJTnyqesI/OKA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-ruby.min.js" integrity="sha512-nZhScFe97xNhTJagZGzULw/bXKEXP3+A8Ffn8ihAzjyalCYMQMW3xwHiLtAp9xJCGtatgmHKgmzQJpj9iUHIw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js" integrity="sha512-5LZ+gLwOKMKpOH9z8aDWwkBK5J015BZGcLdmMqKyK3r+JK7qvN2tzOlRemote7yMHYC9jrR0HRmLLFnXuYnQAKg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js" integrity="sha512-1qYok2x2Rsm2y+mrdyrp00iH7xYSgVyIQ1egDAoT7CBZ9GX+TiiBnAJsHVS/wKKYW0RlKCPFELrEkZiMF/0Eyw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     
     <!-- Emergency button fix script -->
     <script id="emergency-button-fix">

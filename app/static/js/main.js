@@ -457,57 +457,76 @@ async function fetchLanguages() {
 }
 
 /**
- * Translate the error message
+ * Translate the error message with enhanced security
  */
 async function translateError() {
     console.log('translateError function called');
     
-    // Debug element existence
-    console.log('Debug - Elements check:', {
-        errorInput: !!errorInput,
-        errorInputValue: errorInput ? errorInput.value : 'undefined',
-        translateBtn: !!translateBtn,
-        loadingOverlay: !!document.getElementById('loading-overlay'),
-        languageSelect: !!languageSelect,
-        selectedLanguage: languageSelect ? languageSelect.value : 'undefined'
-    });
+    // Validate existence of required elements
+    if (!errorInput) {
+        console.error('Error: Error input element not found');
+        showError('Application error: Missing UI elements');
+        return;
+    }
     
-    const errorMessage = errorInput.value.trim();
+    // Input validation - sanitize input
+    const errorMessage = (errorInput.value || '').trim();
+    
+    // Basic input validation
     if (!errorMessage) {
         showError('Please enter an error message to translate.');
         return;
     }
     
-    console.log('Error message to translate:', errorMessage);
+    // Length validation to prevent abuse
+    if (errorMessage.length > 10000) {
+        showError('Error message too long. Please limit to 10,000 characters.');
+        return;
+    }
     
     // Show loading overlay
     showLoading(true);
     
     try {
-        // Get selected language, ensure it's a valid value
+        // Validate language input
         let language = 'auto';
         if (languageSelect && languageSelect.value) {
-            language = languageSelect.value;
+            // Whitelist check for language values
+            const validLanguages = ['auto', 'python', 'javascript', 'java', 'html', 'css', 'ruby', 'general'];
+            if (validLanguages.includes(languageSelect.value)) {
+                language = languageSelect.value;
+            } else {
+                console.warn('Invalid language selected:', languageSelect.value);
+            }
         }
-        console.log('Selected language:', language);
         
-        // Build the API URL
-        let apiUrl = '/api/translate';
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            apiUrl = 'http://localhost:5001/api/translate';
+        // Build the API URL - restrict to only this domain for security
+        const apiUrl = '/api/translate';
+        
+        // Get CSRF token from meta tag
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        
+        // Prepare headers with security enhancements
+        const headers = { 
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest' // Helps prevent CSRF
+        };
+        
+        // Add CSRF token if available
+        if (csrfToken) {
+            headers['X-CSRF-Token'] = csrfToken;
         }
         
-        console.log('API URL:', apiUrl);
-        
-        // Make the API request
-        console.log('Making API request with language:', language);
+        // Make the API request with security headers
         const response = await fetch(apiUrl, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: headers,
+            credentials: 'same-origin', // Include cookies for session authentication
             body: JSON.stringify({
                 error_message: errorMessage,
                 language: language,
-                output_language: 'en'  // Always English
+                output_language: 'en',  // Always English
+                client_timestamp: new Date().toISOString() // Add timestamp for request validation
             })
         });
         
@@ -519,40 +538,73 @@ async function translateError() {
             throw new Error(`Server error: ${response.status}`);
         }
         
-        // Parse the response
-        console.log('Parsing response as JSON...');
-        const result = await response.json();
-        console.log('Translation result:', result);
+        // Server response validation
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('API error response:', errorText);
+            throw new Error(`Server error: ${response.status}`);
+        }
         
-        // Display the translation
-        displayTranslation(result);
-        
-        // Update language selector to match the detected language
-        if (language === 'auto' && result.language && languageSelect) {
-            console.log('Auto-detected language:', result.language);
-            // Only update the UI, don't trigger another translation
-            const options = Array.from(languageSelect.options);
-            const foundOption = options.find(option => option.value === result.language);
-            if (foundOption) {
-                // No need to change the selection as it should stay as auto
-                console.log('Language detected:', result.language);
+        try {
+            // Safely parse the response with validation
+            const result = await response.json();
+            
+            // Validate that result contains expected fields
+            if (!result || typeof result !== 'object') {
+                throw new Error('Invalid response format from server');
             }
-        }
-        
-        // Set the language badge
-        const languageBadge = document.getElementById('language-badge');
-        if (languageBadge && result.language) {
-            languageBadge.textContent = capitalizeFirstLetter(result.language);
-            languageBadge.dataset.language = result.language;
-            console.log('Updated language badge to:', result.language);
-        }
+            
+            // Basic validation of critical fields
+            if (!result.explanation || !result.title) {
+                console.warn('Incomplete translation result received:', result);
+            }
+            
+            // Display the translation with the validated result
+            displayTranslation(result);
+            
+            // Securely update language selector to match the detected language
+            if (language === 'auto' && result.language && languageSelect) {
+                // Validate language value before using
+                const safeLanguage = result.language.toLowerCase();
+                const validLanguages = ['python', 'javascript', 'java', 'html', 'css', 'ruby', 'general'];
+                
+                if (validLanguages.includes(safeLanguage)) {
+                    console.log('Auto-detected language:', safeLanguage);
+                    
+                    // Safely update UI using textContent instead of innerHTML
+                    const options = Array.from(languageSelect.options);
+                    const foundOption = options.find(option => option.value === safeLanguage);
+                    if (foundOption) {
+                        console.log('Language detected:', safeLanguage);
+                    }
+                }
+            }
+            
+            // Safely set the language badge using textContent
+            const languageBadge = document.getElementById('language-badge');
+            if (languageBadge && result.language) {
+                // Sanitize and validate before using
+                const safeLanguage = result.language.replace(/[^a-zA-Z0-9]/g, '');
+                languageBadge.textContent = capitalizeFirstLetter(safeLanguage);
+                languageBadge.dataset.language = safeLanguage;
+            }
         
         // Save to recent searches
         addToRecentSearches(result);
         
+        } catch (jsonError) {
+            console.error('JSON parsing error:', jsonError);
+            showError('Failed to parse server response');
+        }
     } catch (error) {
         console.error('Translation error:', error);
-        showError(`Failed to translate: ${error.message}`);
+        // Show a generic error message to avoid leaking implementation details
+        showError('Failed to translate error message. Please try again.');
+        
+        // Log the actual error with more detail for debugging
+        if (error.message) {
+            console.error('Detailed error:', error.message);
+        }
     } finally {
         showLoading(false);
     }
