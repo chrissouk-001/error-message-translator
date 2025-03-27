@@ -8,6 +8,7 @@ import re
 import time
 import logging
 from functools import lru_cache
+from typing import Dict, Optional
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -67,35 +68,23 @@ def translate_text(text, output_language=None):
 
 
 @lru_cache(maxsize=128)  # Cache results to improve performance and reduce regex load
-def detect_language(error_message):
-    """
-    Attempt to detect the programming language from the error message.
-    Now with improved security handling and caching for performance.
-
+def detect_language(error_message: str) -> str:
+    """Detect programming language from error message.
+    
     Args:
-        error_message (str): The error message to analyze
-
+        error_message: The error message to analyze
+        
     Returns:
-        str: The detected language ('python', 'javascript', 'html', 'css', 'java', 'ruby', or 'general')
+        The detected language name
+        
+    Raises:
+        ValueError: If error_message is empty or invalid
     """
-    # Input validation
-    if not isinstance(error_message, str):
-        logger.warning(f"Non-string input to detect_language: {type(error_message)}")
-        error_message = str(error_message) if error_message is not None else ""
-    
-    # Limit input length for security
-    if len(error_message) > MAX_ERROR_LENGTH:
-        logger.warning(f"Error message exceeding max length ({len(error_message)} chars) truncated")
-        error_message = error_message[:MAX_ERROR_LENGTH]
-    
-    # Initialize counters for each language
-    language_scores = {
-        "python": 0,
-        "javascript": 0,
-        "java": 0,
-        "html": 0,
-        "css": 0,
-        "ruby": 0,
+    if not error_message or not isinstance(error_message, str):
+        raise ValueError("Invalid error message")
+        
+    language_scores: Dict[str, int] = {
+        lang: 0 for lang in SUPPORTED_LANGUAGES
     }
     
     # Common language-specific keywords to boost detection confidence
