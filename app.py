@@ -14,8 +14,8 @@ def index():
     """Render the main page of the application."""
     from flask import render_template
 
-    # Render and return the main HTML template
-    return render_template("index.html")
+    # Render and return the main HTML template with hasattr included in the context
+    return render_template("index.html", hasattr=hasattr)
 
 
 # Main function to run the Flask application
