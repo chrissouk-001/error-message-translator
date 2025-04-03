@@ -221,4 +221,173 @@ public class Example {
 """,
     "related_errors": ["java.lang.NumberFormatException"],
     "difficulty": "beginner",
+})
+
+# Add ConcurrentModificationException pattern
+PATTERNS.append({
+    "regex": r"java\.util\.ConcurrentModificationException(?:\s+at\s+(.+))?",
+    "title": "Concurrent Modification Exception",
+    "explanation": "You're trying to modify a collection (like ArrayList, HashMap, etc.) while iterating over it with a for-each loop or Iterator.",
+    "solution": "Don't modify a collection while iterating over it. Instead, use an Iterator with its remove() method, use removeIf(), or create a copy of the collection to modify.",
+    "code_example": """
+// Incorrect:
+ArrayList<String> list = new ArrayList<>(Arrays.asList("A", "B", "C"));
+for (String element : list) {
+    if (element.equals("B")) {
+        list.remove(element);  // ConcurrentModificationException
+    }
+}
+
+// Correct with Iterator:
+ArrayList<String> list = new ArrayList<>(Arrays.asList("A", "B", "C"));
+Iterator<String> iterator = list.iterator();
+while (iterator.hasNext()) {
+    String element = iterator.next();
+    if (element.equals("B")) {
+        iterator.remove();  // Safe removal during iteration
+    }
+}
+
+// Correct with Java 8+ removeIf:
+ArrayList<String> list = new ArrayList<>(Arrays.asList("A", "B", "C"));
+list.removeIf(element -> element.equals("B"));
+""",
+    "related_errors": ["UnsupportedOperationException"],
+    "difficulty": "intermediate",
+})
+
+# Add ClassCastException pattern
+PATTERNS.append({
+    "regex": r"java\.lang\.ClassCastException: ([^\s]+) cannot be cast to ([^\s]+)",
+    "title": "Invalid Class Cast",
+    "explanation": "You're trying to cast an object of type {{$1}} to type {{$2}}, but these types are not compatible for casting.",
+    "solution": "Make sure you only cast objects to compatible types. Use 'instanceof' to check if an object is of a particular type before casting it.",
+    "code_example": """
+// Incorrect:
+Object obj = new Integer(42);
+String str = (String) obj;  // ClassCastException: Integer cannot be cast to String
+
+// Correct with type check:
+Object obj = new Integer(42);
+if (obj instanceof String) {
+    String str = (String) obj;
+} else {
+    // Handle case where obj is not a String
+    System.out.println("Not a string: " + obj);
+}
+
+// Better with Java 10+ var and no casting:
+var number = 42;  // Inferred as int
+var text = number.toString();  // No casting needed
+""",
+    "related_errors": ["ArrayStoreException"],
+    "difficulty": "beginner",
+})
+
+# Add IllegalArgumentException pattern
+PATTERNS.append({
+    "regex": r"java\.lang\.IllegalArgumentException:\s+(.+)",
+    "title": "Illegal Argument Exception",
+    "explanation": "A method has been passed an inappropriate argument. The error message says: {{$1}}",
+    "solution": "Check the documentation for the method you're calling to understand what arguments are acceptable. Ensure your inputs meet the required conditions.",
+    "code_example": """
+// Examples that cause IllegalArgumentException:
+
+// Negative array size:
+int[] array = new int[-1];  // IllegalArgumentException: Negative array size
+
+// Invalid enum constant:
+enum Color { RED, GREEN, BLUE }
+Color c = Enum.valueOf(Color.class, "YELLOW");  // IllegalArgumentException: No enum constant Color.YELLOW
+
+// Correct usage:
+int[] array = new int[10];  // Positive array size
+
+// With enum validation:
+String colorName = "YELLOW";
+try {
+    Color c = Enum.valueOf(Color.class, colorName);
+} catch (IllegalArgumentException e) {
+    // Handle invalid enum constant
+    System.out.println("Invalid color: " + colorName);
+    // Use a default value instead
+    Color c = Color.RED;
+}
+""",
+    "related_errors": ["IllegalStateException", "NumberFormatException"],
+    "difficulty": "beginner",
+})
+
+# Add NoSuchElementException pattern
+PATTERNS.append({
+    "regex": r"java\.util\.NoSuchElementException(?:\s+at\s+(.+))?",
+    "title": "No Such Element Exception",
+    "explanation": "You're trying to access an element that doesn't exist, typically when using an Iterator, Scanner, or retrieving the first element from an empty collection.",
+    "solution": "Always check if an element exists before trying to access it. Use hasNext() for iterators and scanners, or isEmpty() for collections.",
+    "code_example": """
+// Incorrect:
+LinkedList<String> list = new LinkedList<>();
+String first = list.getFirst();  // NoSuchElementException: list is empty
+
+// Incorrect Iterator usage:
+Iterator<String> it = list.iterator();
+String element = it.next();  // NoSuchElementException: no more elements
+
+// Correct with check:
+LinkedList<String> list = new LinkedList<>();
+if (!list.isEmpty()) {
+    String first = list.getFirst();  // Safe, we checked first
+}
+
+// Correct Iterator usage:
+Iterator<String> it = list.iterator();
+if (it.hasNext()) {
+    String element = it.next();  // Safe, we checked first
+}
+""",
+    "related_errors": ["IndexOutOfBoundsException", "EmptyStackException"],
+    "difficulty": "beginner",
+})
+
+# Add OutOfMemoryError pattern
+PATTERNS.append({
+    "regex": r"java\.lang\.OutOfMemoryError: ([^\n]+)",
+    "title": "Out of Memory Error",
+    "explanation": "Your Java program has exhausted its available memory. The specific issue is: {{$1}}",
+    "solution": "Reduce memory usage by fixing memory leaks, using more efficient data structures, or increasing the heap size using JVM flags (-Xmx).",
+    "code_example": """
+// Common causes of OutOfMemoryError:
+
+// 1. Creating excessively large arrays/collections:
+int[] hugeArray = new int[Integer.MAX_VALUE];  // OutOfMemoryError: Java heap space
+
+// 2. Infinite recursion:
+void infiniteRecursion() {
+    List<Object> list = new ArrayList<>();
+    while (true) {
+        list.add(new byte[1000000]);  // Eventually: OutOfMemoryError
+    }
+}
+
+// 3. Memory leaks (objects remain referenced when no longer needed)
+
+// Solutions:
+// 1. Increase heap space (command line):
+// java -Xmx2g MyApplication
+
+// 2. Fix memory usage in code:
+void improvedMethod() {
+    // Use try-with-resources for Closeable resources
+    try (InputStream is = new FileInputStream("file.txt")) {
+        // Resources automatically closed
+    } catch (IOException e) {
+        // Handle exception
+    }
+    
+    // Use weak references for caches
+    Map<Key, SoftReference<Value>> cache = new HashMap<>();
+}
+""",
+    "related_errors": ["StackOverflowError", "GC overhead limit exceeded"],
+    "difficulty": "advanced",
 }) 

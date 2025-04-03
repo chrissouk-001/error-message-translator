@@ -150,3 +150,174 @@ div:hover {  /* Element with valid pseudo-class */
     "related_errors": ["Selector syntax error", "Unrecognized pseudo-class"],
     "difficulty": "intermediate"
 })
+
+# Add CSS Grid error pattern
+PATTERNS.append({
+    "regex": r"Invalid property value.+?grid-template-areas",
+    "title": "Invalid Grid Template Areas",
+    "explanation": "Your CSS grid-template-areas property has an invalid value. Grid areas must form a rectangle and each cell must be named or have a period (.) to indicate an empty cell.",
+    "solution": "Make sure all rows in your grid-template-areas have the same number of cells and form a complete rectangle. Each named area must be rectangular.",
+    "code_example": """
+/* Incorrect - uneven rows */
+.grid {
+  grid-template-areas:
+    "header header"
+    "sidebar main main"; /* Error: uneven number of columns */
+}
+
+/* Incorrect - non-rectangular area */
+.grid {
+  grid-template-areas:
+    "header header header"
+    "sidebar main main"
+    "sidebar footer footer"; /* Error: 'sidebar' is not rectangular */
+}
+
+/* Correct */
+.grid {
+  grid-template-areas:
+    "header header header"
+    "sidebar main main"
+    "footer footer footer";
+}
+""",
+    "related_errors": ["Property grid-template-columns doesn't exist"],
+    "difficulty": "intermediate",
+})
+
+# Add CSS Media Query error
+PATTERNS.append({
+    "regex": r"Error in parsing value for 'media'.+?at line (\d+)",
+    "title": "Invalid Media Query Syntax",
+    "explanation": "There's a syntax error in your media query at line {{$1}}. Media queries have a specific syntax that must be followed.",
+    "solution": "Check your media query syntax. Media features must be wrapped in parentheses, and logical operators (and/or) must be used correctly.",
+    "code_example": """
+/* Incorrect - missing parentheses */
+@media screen and min-width: 768px {
+  /* styles */
+}
+
+/* Incorrect - missing 'and' operator */
+@media screen (min-width: 768px) {
+  /* styles */
+}
+
+/* Correct */
+@media screen and (min-width: 768px) {
+  /* styles */
+}
+
+/* Correct with multiple conditions */
+@media screen and (min-width: 768px) and (max-width: 1200px) {
+  /* styles */
+}
+""",
+    "related_errors": ["Expected media feature name but found"],
+    "difficulty": "beginner",
+})
+
+# Add CSS Variable error
+PATTERNS.append({
+    "regex": r"Invalid variable reference.+?var\(([^)]+)\)",
+    "title": "Invalid CSS Variable Reference",
+    "explanation": "There's an issue with your CSS variable (custom property) reference: var({{$1}}). The variable might not be defined or the syntax is incorrect.",
+    "solution": "Make sure the CSS variable is properly defined with -- prefix in a parent element or :root. Also check for typos in the variable name.",
+    "code_example": """
+/* Incorrect - using variable without defining it */
+.element {
+  color: var(--primary-color); /* Error if --primary-color is not defined */
+}
+
+/* Incorrect - wrong syntax */
+:root {
+  primary-color: blue; /* Missing -- prefix */
+}
+
+/* Correct */
+:root {
+  --primary-color: blue; /* Define with -- prefix */
+}
+
+.element {
+  color: var(--primary-color); /* Now it works */
+}
+
+/* With fallback value */
+.element {
+  color: var(--primary-color, #333); /* Fallback to #333 if variable not defined */
+}
+""",
+    "related_errors": ["Property doesn't exist"],
+    "difficulty": "beginner",
+})
+
+# Add Flexbox error
+PATTERNS.append({
+    "regex": r"Property value .+? is invalid for .+?flex",
+    "title": "Invalid Flexbox Property Value",
+    "explanation": "You're using an invalid value for a flexbox property. Flexbox properties have specific accepted values.",
+    "solution": "Check the documentation for the specific flexbox property you're using to see what values are valid.",
+    "code_example": """
+/* Incorrect - invalid value */
+.container {
+  display: flex;
+  flex-direction: across; /* Error: 'across' is not a valid value */
+}
+
+/* Incorrect - using percentage for flex-basis in shorthand */
+.item {
+  flex: 1 1 50%; /* This actually works, but can cause confusion */
+}
+
+/* Correct flex-direction values */
+.container {
+  display: flex;
+  flex-direction: row; /* or column, row-reverse, column-reverse */
+}
+
+/* Correct flex shorthand */
+.item {
+  flex: 1; /* flex-grow: 1, flex-shrink: 1, flex-basis: 0% */
+}
+""",
+    "related_errors": ["Property doesn't exist"],
+    "difficulty": "intermediate",
+})
+
+# Add CSS Animation error
+PATTERNS.append({
+    "regex": r"Error in parsing value for 'animation'.+?: .*?",
+    "title": "Invalid CSS Animation Value",
+    "explanation": "There's a syntax error in your CSS animation property. Animation properties require specific syntax for timing, easing, and keyframes.",
+    "solution": "Check that your animation name matches a defined @keyframes rule and that you've specified the correct values for duration, timing function, delay, etc.",
+    "code_example": """
+/* Incorrect - animation name doesn't match keyframes or missing values */
+.element {
+  animation: slide 2s; /* Error if 'slide' keyframes not defined */
+}
+
+/* Incorrect - wrong order of values */
+.element {
+  animation: 2s infinite slide; /* Name should come first */
+}
+
+/* Correct with keyframes */
+@keyframes slide {
+  from { transform: translateX(0); }
+  to { transform: translateX(100px); }
+}
+
+.element {
+  animation: slide 2s ease infinite; /* name, duration, timing-function, iteration-count */
+}
+
+/* Multiple animations */
+.element {
+  animation: 
+    slide 2s ease infinite,
+    fade 1s ease-in;
+}
+""",
+    "related_errors": ["Unknown property name"],
+    "difficulty": "intermediate",
+})

@@ -163,4 +163,120 @@ console.log(user?.name);  // undefined (instead of throwing an error)
 """,
     "related_errors": ["ReferenceError: X is not defined", "TypeError: Cannot read property of null"],
     "difficulty": "beginner",
+})
+
+# Add Promise-related TypeError
+PATTERNS.append({
+    "regex": r"TypeError: Promise resolver ([^(]+) is not a function",
+    "title": "Invalid Promise Constructor Parameter",
+    "explanation": "When creating a new Promise, you need to provide a function as the resolver parameter, but you provided a {{$1}} instead.",
+    "solution": "Make sure to pass a function to the Promise constructor that takes 'resolve' and 'reject' parameters.",
+    "code_example": """
+// Incorrect:
+const myPromise = new Promise(123);  // TypeError: Promise resolver 123 is not a function
+
+// Correct:
+const myPromise = new Promise((resolve, reject) => {
+  // Do something asynchronous, then:
+  resolve('Success!');  // or reject('Error!') if there's an error
+});
+""",
+    "related_errors": ["SyntaxError: missing ) after argument list"],
+    "difficulty": "intermediate",
+})
+
+# Add async/await TypeError
+PATTERNS.append({
+    "regex": r"TypeError: ([^(]+) is not a function or its return value is not iterable",
+    "title": "Invalid Await Target",
+    "explanation": "You're trying to use 'await' with {{$1}}, which is not a function that returns a Promise or an iterable object for use with for-await-of.",
+    "solution": "Make sure you're awaiting a function that returns a Promise or using for-await-of with an async iterable.",
+    "code_example": """
+// Incorrect:
+async function fetchData() {
+  const data = await 123;  // TypeError: 123 is not a function or its return value is not iterable
+  return data;
+}
+
+// Correct:
+async function fetchData() {
+  const response = await fetch('https://api.example.com/data');
+  const data = await response.json();
+  return data;
+}
+""",
+    "related_errors": ["SyntaxError: await is only valid in async functions"],
+    "difficulty": "intermediate",
+})
+
+# Add JSON parsing TypeError
+PATTERNS.append({
+    "regex": r"TypeError: JSON\.parse: unexpected (character|non-whitespace character) at line (\d+) column (\d+) of the JSON data",
+    "title": "Invalid JSON Format",
+    "explanation": "JSON.parse encountered an unexpected {{$1}} at line {{$2}}, column {{$3}} while trying to parse a string as JSON.",
+    "solution": "Check your JSON string for syntax errors like missing quotes, commas, or brackets. Use a JSON validator to find and fix formatting issues.",
+    "code_example": """
+// Incorrect:
+const jsonStr = '{"name": "John", "age": 30,}';  // Extra comma
+const obj = JSON.parse(jsonStr);  // TypeError: JSON.parse: unexpected character
+
+// Correct:
+const jsonStr = '{"name": "John", "age": 30}';  // Valid JSON
+const obj = JSON.parse(jsonStr);  // Works!
+""",
+    "related_errors": ["SyntaxError: JSON.parse: unexpected character"],
+    "difficulty": "beginner",
+})
+
+# Add null or undefined property access TypeError
+PATTERNS.append({
+    "regex": r"TypeError: Cannot read (?:property|properties) '([^']+)' of (null|undefined)",
+    "title": "Accessing Property of {{$2}}",
+    "explanation": "You're trying to access the '{{$1}}' property of a {{$2}} value. This happens when a variable hasn't been initialized or doesn't exist.",
+    "solution": "Add a check to make sure the object exists before accessing its properties. Use optional chaining (?.) or the nullish coalescing operator (??) in modern JavaScript.",
+    "code_example": """
+// Incorrect:
+const user = null;
+console.log(user.name);  // TypeError: Cannot read property 'name' of null
+
+// Correct with if check:
+if (user) {
+  console.log(user.name);
+}
+
+// Correct with optional chaining (modern JS):
+console.log(user?.name);  // Returns undefined instead of throwing error
+
+// Correct with default value:
+console.log((user || {}).name);  // Returns undefined
+""",
+    "related_errors": ["ReferenceError: variable is not defined"],
+    "difficulty": "beginner",
+})
+
+# Add template literal TypeError
+PATTERNS.append({
+    "regex": r"TypeError: ([^(]+) is not a function$",
+    "title": "Invalid Function Call",
+    "explanation": "You're trying to call {{$1}} as if it were a function, but it's not a function.",
+    "solution": "Check if you're using template literals (backticks) without a tag function, or if you've accidentally used parentheses after a non-function value.",
+    "code_example": """
+// Incorrect:
+const name = "John";
+const greeting = name`Hello`;  // TypeError: name is not a function
+
+// Correct:
+const name = "John";
+const greeting = `Hello ${name}`;  // Works!
+
+// Another common error:
+const obj = { name: "John" };
+const result = obj();  // TypeError: obj is not a function
+
+// Correct:
+const obj = { name: "John" };
+const name = obj.name;  // Works!
+""",
+    "related_errors": ["SyntaxError: unexpected token"],
+    "difficulty": "beginner",
 }) 
