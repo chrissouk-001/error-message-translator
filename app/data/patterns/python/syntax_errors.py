@@ -238,4 +238,24 @@ for item in items:
 """,
     "related_errors": ["SyntaxError: 'break' outside loop"],
     "difficulty": "beginner",
+})
+
+# Add unexpected character after line continuation character
+PATTERNS.append({
+    "regex": r"SyntaxError: unexpected character after line continuation character",
+    "title": "Unexpected Character After Line Continuation",
+    "explanation": "You used a backslash (\\) to continue a line, but there is an unexpected character after it. Only whitespace or a newline is allowed after a line continuation backslash.",
+    "solution": "Remove any characters after the backslash, or use parentheses for multi-line statements instead of a backslash.",
+    "code_example": """
+# Incorrect:
+result = 1 + \\n2  # SyntaxError: unexpected character after line continuation character
+
+# Correct:
+result = 1 + 2
+# Or use parentheses:
+result = (1 +
+          2)
+""",
+    "related_errors": ["SyntaxError: invalid syntax"],
+    "difficulty": "beginner",
 }) 

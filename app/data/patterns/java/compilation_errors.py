@@ -161,4 +161,31 @@ public class Example {
 """,
     "related_errors": ["cannot find symbol"],
     "difficulty": "beginner",
+})
+
+# Illegal start of expression
+PATTERNS.append({
+    "regex": r"(?:error:|Error:)?\\s*illegal start of expression",
+    "title": "Illegal Start of Expression",
+    "explanation": "Java encountered code where it didn't expect an expression. This often happens due to misplaced braces, missing semicolons, or incorrect method/class structure.",
+    "solution": "Check for missing or extra braces, misplaced code outside of methods, or missing semicolons. Make sure all statements are inside methods or constructors, and that your class structure is correct.",
+    "code_example": """
+// Incorrect:
+public class Example {
+    int x = 10
+    public static void main(String[] args) {
+        System.out.println(x);
+    }
+}
+
+// Correct:
+public class Example {
+    int x = 10;
+    public static void main(String[] args) {
+        System.out.println(new Example().x);
+    }
+}
+""",
+    "related_errors": ["';' expected", "cannot find symbol"],
+    "difficulty": "beginner",
 }) 

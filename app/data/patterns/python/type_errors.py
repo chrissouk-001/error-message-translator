@@ -115,4 +115,30 @@ a, b = number_list  # Works! a = 42, b = 73
 """,
     "related_errors": ["ValueError: too many values to unpack"],
     "difficulty": "intermediate",
+})
+
+# TypeError: 'NoneType' object is not iterable
+PATTERNS.append({
+    "regex": r"TypeError: 'NoneType' object is not iterable",
+    "title": "Cannot Iterate Over None",
+    "explanation": "You're trying to loop over a variable or use an operation that expects an iterable (like a list or string), but the variable's value is None.",
+    "solution": "Check if the variable is None before trying to iterate over it. Ensure the variable is assigned a valid iterable (e.g., an empty list [] instead of None) if iteration is always expected.",
+    "code_example": """
+# Incorrect:
+my_list = None
+for item in my_list:  # TypeError: 'NoneType' object is not iterable
+    print(item)
+
+# Correct:
+my_list = None
+if my_list is not None:
+    for item in my_list:
+        print(item)
+# Or initialize with an empty list:
+my_list = []
+for item in my_list:  # Works fine (loop doesn't run)
+    print(item)
+""",
+    "related_errors": ["TypeError: object is not iterable"],
+    "difficulty": "beginner",
 }) 

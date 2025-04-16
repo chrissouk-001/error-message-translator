@@ -126,4 +126,30 @@ end
 """,
     "related_errors": ["SyntaxError: unexpected keyword_end", "SyntaxError: unexpected tIDENTIFIER"],
     "difficulty": "beginner",
+})
+
+# SyntaxError: unexpected keyword_end
+PATTERNS.append({
+    "regex": r"SyntaxError: (?:.*?)unexpected keyword_end",
+    "title": "Unexpected 'end' Keyword",
+    "explanation": "Ruby found an 'end' keyword where it wasn't expecting one. This usually means you have too many 'end' statements, or an 'end' in the wrong place.",
+    "solution": "Check your code for extra 'end' statements. Make sure each 'end' matches an opening block like 'def', 'if', 'do', 'class', or 'module'.",
+    "code_example": """
+# Incorrect:
+def greet(name)
+  if name
+    puts "Hello, #{name}!"
+  end
+end
+end  # Extra 'end' here
+
+# Correct:
+def greet(name)
+  if name
+    puts "Hello, #{name}!"
+  end
+end
+""",
+    "related_errors": ["SyntaxError: unexpected end-of-input", "SyntaxError: unexpected token"],
+    "difficulty": "beginner",
 }) 

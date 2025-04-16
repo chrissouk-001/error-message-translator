@@ -93,4 +93,27 @@ end
 """,
     "related_errors": ["NameError", "TypeError"],
     "difficulty": "beginner",
+})
+
+# LoadError: cannot load such file
+PATTERNS.append({
+    "regex": r"LoadError: cannot load such file -- (.+)",
+    "title": "Cannot Load File: {{$1}}",
+    "explanation": "Ruby failed to load the file '{{$1}}'. This happens when you try to 'require' or 'load' a file that Ruby can't find in its load path.",
+    "solution": "Make sure the file '{{$1}}' exists and is correctly spelled. Check if the file is in a directory included in Ruby's $LOAD_PATH. If it's a gem, ensure the gem is installed. If it's a relative path, use 'require_relative' instead.",
+    "code_example": """
+# Incorrect:
+require 'my_missing_library'  # LoadError: cannot load such file -- my_missing_library
+
+# Correct:
+# Option 1: Ensure the file exists in $LOAD_PATH or install the gem
+# gem install my_library
+# require 'my_library'
+
+# Option 2: Use require_relative for local files
+# Assuming 'my_local_file.rb' is in the same directory
+require_relative 'my_local_file'
+""",
+    "related_errors": ["NameError: uninitialized constant"],
+    "difficulty": "intermediate",
 }) 

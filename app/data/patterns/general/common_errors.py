@@ -153,4 +153,62 @@ with open('output.txt', 'w', encoding='utf-8') as file:
 """,
     "related_errors": ["UnicodeError", "codec can't decode", "codec can't encode"],
     "difficulty": "intermediate"
+})
+
+# Connection Refused
+PATTERNS.append({
+    "regex": r"Connection refused|ECONNREFUSED|connection was forcibly closed|could not connect to server",
+    "title": "Connection Refused",
+    "explanation": "Your program tried to connect to a server or service, but the connection was refused. This usually means the server is not running, is not accepting connections, or is blocked by a firewall.",
+    "solution": "Check that the server or service is running and listening on the correct port. Make sure there are no firewall or network issues blocking the connection. Verify the hostname and port are correct.",
+    "code_example": """
+# Example in Python
+import socket
+s = socket.socket()
+try:
+    s.connect(('localhost', 5432))
+except ConnectionRefusedError:
+    print("Could not connect to the server. Is it running?")
+
+# Example in JavaScript (Node.js)
+const net = require('net');
+const client = net.createConnection({ port: 5432 }, () => {});
+client.on('error', (err) => {
+  if (err.code === 'ECONNREFUSED') {
+    console.log('Connection refused. Is the server running?');
+  }
+});
+""",
+    "related_errors": ["Connection timed out", "Network unreachable", "Server not found"],
+    "difficulty": "beginner",
+})
+
+# Disk Full / No Space Left
+PATTERNS.append({
+    "regex": r"Disk full|No space left on device|ENOSPC",
+    "title": "Disk Full / No Space Left",
+    "explanation": "The system has run out of disk space. Your program tried to write to a file or perform an operation that required more disk space than available.",
+    "solution": "Free up disk space on the relevant drive or partition. Delete unnecessary files, clear caches, or move data to another storage location. Increase the disk size if possible.",
+    "code_example": """
+# Check disk space before performing large writes (platform-specific)
+
+# Linux/Mac (using os module in Python)
+import os
+stat = os.statvfs('/')  # Check root partition
+free_space_gb = (stat.f_bavail * stat.f_frsize) / (1024**3)
+
+if free_space_gb < 1: # Example: check if less than 1GB free
+    print("Warning: Low disk space!")
+    # Handle the situation, e.g., stop the operation or notify the user
+
+# General solution: Clean up disk space manually or via scripts
+# Example commands (Linux/Mac):
+# Check usage: df -h
+# Find large files/dirs: du -sh /path/to/check/* | sort -rh | head -n 10
+# Remove logs: rm /var/log/*.log
+# Clear package cache (Debian/Ubuntu): sudo apt-get clean
+# Clear package cache (Fedora): sudo dnf clean all
+""",
+    "related_errors": ["IOException", "Permission denied"],
+    "difficulty": "intermediate",
 }) 

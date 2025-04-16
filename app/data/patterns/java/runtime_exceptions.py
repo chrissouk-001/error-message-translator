@@ -286,35 +286,45 @@ var text = number.toString();  // No casting needed
 
 # Add IllegalArgumentException pattern
 PATTERNS.append({
-    "regex": r"java\.lang\.IllegalArgumentException:\s+(.+)",
-    "title": "Illegal Argument Exception",
-    "explanation": "A method has been passed an inappropriate argument. The error message says: {{$1}}",
-    "solution": "Check the documentation for the method you're calling to understand what arguments are acceptable. Ensure your inputs meet the required conditions.",
+    "regex": r"java\.lang\.IllegalArgumentException(?::\s*(.+))?",
+    "title": "Illegal Argument Exception: {{$1}}",
+    "explanation": "You passed an argument to a method that is not valid or appropriate for that method, as described by the message: '{{$1}}'.",
+    "solution": "Check the documentation for the method you're calling to understand the expected arguments. Ensure the value you're passing meets the method's requirements (e.g., within a specific range, not null, correct format).",
     "code_example": """
-// Examples that cause IllegalArgumentException:
+// Incorrect:
+public class Example {
+    public void setAge(int age) {
+        if (age < 0) {
+            throw new IllegalArgumentException("Age cannot be negative");
+        }
+        // ...
+    }
+    public static void main(String[] args) {
+        Example ex = new Example();
+        ex.setAge(-5);  // IllegalArgumentException: Age cannot be negative
+    }
+}
 
-// Negative array size:
-int[] array = new int[-1];  // IllegalArgumentException: Negative array size
-
-// Invalid enum constant:
-enum Color { RED, GREEN, BLUE }
-Color c = Enum.valueOf(Color.class, "YELLOW");  // IllegalArgumentException: No enum constant Color.YELLOW
-
-// Correct usage:
-int[] array = new int[10];  // Positive array size
-
-// With enum validation:
-String colorName = "YELLOW";
-try {
-    Color c = Enum.valueOf(Color.class, colorName);
-} catch (IllegalArgumentException e) {
-    // Handle invalid enum constant
-    System.out.println("Invalid color: " + colorName);
-    // Use a default value instead
-    Color c = Color.RED;
+// Correct:
+public class Example {
+    public void setAge(int age) {
+        if (age < 0) {
+            throw new IllegalArgumentException("Age cannot be negative");
+        }
+        // ...
+    }
+    public static void main(String[] args) {
+        Example ex = new Example();
+        int inputAge = 25;
+        if (inputAge >= 0) { // Validate before calling
+            ex.setAge(inputAge);
+        } else {
+            System.out.println("Invalid age provided.");
+        }
+    }
 }
 """,
-    "related_errors": ["IllegalStateException", "NumberFormatException"],
+    "related_errors": ["java.lang.NullPointerException", "java.lang.NumberFormatException"],
     "difficulty": "beginner",
 })
 

@@ -118,4 +118,51 @@ PATTERNS.append({
 """,
     "related_errors": ["Invalid ID", "Duplicate attribute"],
     "difficulty": "beginner",
+})
+
+# Missing DOCTYPE declaration
+PATTERNS.append({
+    "regex": r"(Error:|Missing DOCTYPE|No DOCTYPE specified)",
+    "title": "Missing DOCTYPE Declaration",
+    "explanation": "Your HTML file is missing a DOCTYPE declaration at the top. Without it, browsers may render the page in quirks mode, leading to inconsistent behavior.",
+    "solution": "Add '<!DOCTYPE html>' as the very first line of your HTML file to ensure standards-compliant rendering.",
+    "code_example": """
+<!-- Incorrect: -->
+<html>
+  <head><title>My Page</title></head>
+  <body>...</body>
+</html>
+
+<!-- Correct: -->
+<!DOCTYPE html>
+<html>
+  <head><title>My Page</title></head>
+  <body>...</body>
+</html>
+""",
+    "related_errors": ["Quirks mode", "Invalid document structure"],
+    "difficulty": "beginner",
+})
+
+# Bad value X for attribute Y on element Z
+PATTERNS.append({
+    "regex": r"Error:\s+Bad value \"([^\"]*)\" for attribute \"([^\"]*)\" on element \"([^\"]*)\"",
+    "title": "Invalid Attribute Value: '{{$1}}' for {{$2}} on {{$3}}",
+    "explanation": "The value '{{$1}}' you provided for the '{{$2}}' attribute on the <{{$3}}> element is not valid or allowed for that attribute.",
+    "solution": "Check the HTML specification for the <{{$3}}> element and its '{{$2}}' attribute to see what values are permitted. Common issues include typos, incorrect formats (e.g., for colors or URLs), or using values outside the allowed range.",
+    "code_example": """
+<!-- Incorrect: Invalid value for 'target' -->
+<a href="#" target="_new">Link</a>
+
+<!-- Correct: Use a valid target value -->
+<a href="#" target="_blank">Link</a>
+
+<!-- Incorrect: Invalid value for 'type' on input -->
+<input type="datee" name="start_date">
+
+<!-- Correct: Use a valid input type -->
+<input type="date" name="start_date">
+""",
+    "related_errors": ["Invalid attribute", "Element missing required attribute"],
+    "difficulty": "beginner",
 }) 

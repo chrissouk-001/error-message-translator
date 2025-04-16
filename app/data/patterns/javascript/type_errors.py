@@ -279,4 +279,27 @@ const name = obj.name;  // Works!
 """,
     "related_errors": ["SyntaxError: unexpected token"],
     "difficulty": "beginner",
+})
+
+# Add assignment to constant variable TypeError
+PATTERNS.append({
+    "regex": r"TypeError: Assignment to constant variable",
+    "title": "Assignment to Constant Variable",
+    "explanation": "You declared a variable using 'const' and are now trying to assign a new value to it. Variables declared with 'const' cannot be reassigned.",
+    "solution": "If the variable needs to be reassigned, declare it using 'let' instead of 'const'. If it should truly be constant, ensure you are not accidentally trying to modify it.",
+    "code_example": """
+// Incorrect:
+const count = 5;
+count = 10;  // TypeError: Assignment to constant variable
+
+// Correct (use let):
+let count = 5;
+count = 10;  // Works!
+
+// Correct (if value shouldn't change):
+const MAX_USERS = 100;
+// Don't try to change MAX_USERS later
+""",
+    "related_errors": ["SyntaxError: Identifier has already been declared"],
+    "difficulty": "beginner",
 }) 

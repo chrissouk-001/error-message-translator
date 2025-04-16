@@ -108,4 +108,25 @@ let b = 10;  // Added semicolons for clarity and safety
 """,
     "related_errors": ["SyntaxError: unexpected token"],
     "difficulty": "beginner",
+})
+
+# SyntaxError: Unexpected reserved word
+PATTERNS.append({
+    "regex": r"SyntaxError: Unexpected reserved word",
+    "title": "Unexpected Reserved Word",
+    "explanation": "You used a reserved word (like 'await', 'yield', or 'static') in a place where it's not allowed. For example, 'await' can only be used inside async functions.",
+    "solution": "Check if you're using the reserved word in the correct context. For 'await', make sure your function is declared with 'async'.",
+    "code_example": """
+// Incorrect:
+function fetchData() {
+  const data = await fetch('/api/data'); // SyntaxError: Unexpected reserved word
+}
+
+// Correct:
+async function fetchData() {
+  const data = await fetch('/api/data');
+}
+""",
+    "related_errors": ["SyntaxError: Unexpected identifier", "SyntaxError: Unexpected token"],
+    "difficulty": "intermediate",
 }) 

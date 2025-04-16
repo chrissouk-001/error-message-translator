@@ -321,3 +321,62 @@ PATTERNS.append({
     "related_errors": ["Unknown property name"],
     "difficulty": "intermediate",
 })
+
+# Add Unknown Pseudo-class or Pseudo-element error
+PATTERNS.append({
+    "regex": r"Unknown pseudo-(class|element)|Unrecognized pseudo-(class|element)",
+    "title": "Unknown Pseudo-class or Pseudo-element",
+    "explanation": "The CSS uses a pseudo-class or pseudo-element that is not recognized. This could be due to a typo or using a feature not supported by the browser.",
+    "solution": "Check the spelling of the pseudo-class or pseudo-element. Refer to the CSS specification or browser compatibility tables to ensure it's supported.",
+    "code_example": """
+/* Incorrect - typo in pseudo-class */
+a:hovr {
+    color: red;
+}
+
+/* Correct */
+a:hover {
+    color: red;
+}
+
+/* Incorrect - unsupported pseudo-element */
+p::text {
+    color: blue;
+}
+
+/* Correct */
+p::first-line {
+    color: blue;
+}
+""",
+    "related_errors": ["Invalid selector", "Selector syntax error"],
+    "difficulty": "intermediate",
+})
+
+# Add CSS Parse Error
+PATTERNS.append({
+    "regex": r"Parse Error|Lexical error|Syntax error at line",
+    "title": "CSS Parse Error",
+    "explanation": "The CSS parser encountered an unexpected character or syntax it couldn't understand. This is often caused by typos, unclosed comments, or misplaced symbols.",
+    "solution": "Examine the line mentioned in the error message. Look for typos, missing or extra characters like braces {}, semicolons ;, colons :, or incorrect comment syntax (/* ... */).",
+    "code_example": """
+/* Incorrect - unclosed comment */
+.element {
+    color: red; /* This color is important
+}
+
+/* Incorrect - unexpected character */
+.element {
+    color: red;
+    font-size: 16px&
+}
+
+/* Correct */
+.element {
+    color: red; /* This color is important */
+    font-size: 16px;
+}
+""",
+    "related_errors": ["Missing semicolon", "Missing closing brace", "Invalid property value"],
+    "difficulty": "beginner",
+})
